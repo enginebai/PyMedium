@@ -21,8 +21,9 @@ def medium2markdown(url):
 
     for i in range(0, len(content_html)):
         tag = content_html[i]
+        # text = strip_space(tag.text)
         # print(i, tag.name, '[NONE]' if len(text) == 0 else text)
-        md = toMarkdown(tag)
+        md = to_markdown(tag)
         if md is not None:
             print(i, md)
     driver.quit()
@@ -41,7 +42,7 @@ def strip_space(text, trim_space=True):
         return text
 
 
-def toMarkdown(medium_tag):
+def to_markdown(medium_tag):
     text = strip_space(medium_tag.text)
     if medium_tag.name == 'h3':
         return '## {}'.format(text)
@@ -53,19 +54,30 @@ def toMarkdown(medium_tag):
         for child in medium_tag.children:
             if child.name is None:
                 if len(strip_space(child.string)) > 0:
-                    plain_text += strip_space(child.string, False)
+                    plain_text += strip_space(child.string)
             else:
                 content = strip_space(child.text)
                 if child.name == 'strong':
-                    plain_text += "**{0}**".format(content)
+                    plain_text += " **{0}** ".format(content)
                 elif child.name == 'em':
-                    plain_text += "_{0}_ ".format(content)
+                    plain_text += " _{0}_ ".format(content)
                 elif child.name == 'a':
-                    plain_text += "[{0}]({1}) ".format(content, child['href'])
+                    plain_text += " [{0}]({1}) ".format(content, child['href'])
                 elif child.name == 'code' or child.name == '':
-                    plain_text += "`{0}`".format(content)
+                    plain_text += " `{0}` ".format(content)
                     # print(child.name, child)
         return plain_text
+    elif medium_tag.name == 'figure':
+        img_tag = medium_tag.find('img', class_='progressiveMedia-image')
+        if img_tag is not None and img_tag.has_attr('data-src'):
+            figcaption_tag = medium_tag.find('figcaption')
+            if figcaption_tag is not None:
+                return '![{0}]({1})'.format(strip_space(figcaption_tag.text),
+                                            img_tag['data-src'])
+            else:
+                return '![]({})'.format(img_tag['data-src'])
+    elif medium_tag.name == 'blockquote':
+        pass
     else:
         return None
 
