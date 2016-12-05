@@ -2,6 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/../PyMessager" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../blaze" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../crawler_demo" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../foodie.ai-api" vcs="Git" />
   </component>
