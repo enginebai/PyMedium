@@ -77,7 +77,18 @@ def to_markdown(medium_tag):
             else:
                 return '![]({})'.format(img_tag['data-src'])
     elif medium_tag.name == 'blockquote':
-        pass
+        return '> {}'.format(strip_space(medium_tag.text))
+    elif medium_tag.name == 'ul':
+        li_tags = medium_tag.find_all('li')
+        # use newline to join several item lines
+        list_text = '\n'.join(['* {}'.format(strip_space(li.text)) for li in li_tags])
+        return list_text
+    elif medium_tag.name == 'ol':
+        li_tags = medium_tag.find_all('li')
+        # use newline to join several item lines
+        list_text = '\n'.join(['{0}. {1}'.format(i + 1, strip_space(li_tags[i].text))
+                               for i in range(len(li_tags))])
+        return list_text
     else:
         return None
 
