@@ -8,6 +8,7 @@
 * Italic `<em>` _Italic_
 * Bulleted list `<ul><li></li></ul>` * Item
 * Ordered list `<ol><li></li><ol>` 1. Item
+* 
 * Separator `<hr>` 
 * Code block `<pre>`
 * Inline Code `<code>`

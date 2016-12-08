@@ -24,8 +24,8 @@ def medium2markdown(url):
         # text = strip_space(tag.text)
         # print(i, tag.name, '[NONE]' if len(text) == 0 else text)
         md = to_markdown(tag)
-        if md is not None:
-            print(i, md)
+        # if md is not None:
+        #     print(i, md)
     driver.quit()
 
 
@@ -48,7 +48,7 @@ def to_markdown(medium_tag):
         return '## {}'.format(text)
     elif medium_tag.name == 'h4':
         return '### {}'.format(text)
-    elif medium_tag.name == 'p':
+    elif medium_tag.name == 'p': # text paragraph
         ## find style, link inside a paragraph
         plain_text = ''
         for child in medium_tag.children:
@@ -67,7 +67,7 @@ def to_markdown(medium_tag):
                     plain_text += " `{0}` ".format(content)
                     # print(child.name, child)
         return plain_text
-    elif medium_tag.name == 'figure':
+    elif medium_tag.name == 'figure': # image and comment
         img_tag = medium_tag.find('img', class_='progressiveMedia-image')
         if img_tag is not None and img_tag.has_attr('data-src'):
             figcaption_tag = medium_tag.find('figcaption')
@@ -76,7 +76,7 @@ def to_markdown(medium_tag):
                                             img_tag['data-src'])
             else:
                 return '![]({})'.format(img_tag['data-src'])
-    elif medium_tag.name == 'blockquote':
+    elif medium_tag.name == 'blockquote': # quote
         return '> {}'.format(strip_space(medium_tag.text))
     elif medium_tag.name == 'ul':
         li_tags = medium_tag.find_all('li')
@@ -89,6 +89,44 @@ def to_markdown(medium_tag):
         list_text = '\n'.join(['{0}. {1}'.format(i + 1, strip_space(li_tags[i].text))
                                for i in range(len(li_tags))])
         return list_text
+    elif medium_tag.name == 'pre': # code snippet (not inline code or embed code)
+        # TODO: 1. trim all html tags from original root tag
+        # FIXME: this current one can't solve the code tab or original intent format
+        xs = medium_tag.prettify().split('<br/>')
+
+        for i in range(len(xs)):
+            t = BeautifulSoup(xs[i], "html.parser")
+            code = re.sub(r'\r\n(\s{10})', '', t.text).replace('\n', '')
+            print(i, code)
+        # print(repr(medium_tag.prettify()))
+        # print(medium_tag.text)
+        code_snippet = ''
+        for child in medium_tag.children:
+            code = strip_space(str(child.string))
+            if child.name is None: # plain text
+                code_snippet += code
+                pass
+            elif child.name == 'br': # new line
+                code_snippet += '\n'
+                pass
+            elif child.name == 'strong': # bold
+                code_snippet += '{} '.format(code)
+                pass
+            elif child.name == 'em': # comment
+                pass
+
+            # print(child.name, strip_space(str(child.string)))
+        # return code_snippet
+        # print(code_snippet)
+    elif medium_tag.name == 'hr':
+        return '\n----\n'
+    elif medium_tag.name == 'iframe':
+        # gist, video, github, link...etc.
+        # print(medium_tag.prettify())
+        pass
+    elif medium_tag.name == 'a':
+        # print(medium_tag.prettify())
+        pass
     else:
         return None
 
