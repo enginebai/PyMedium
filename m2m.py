@@ -89,35 +89,16 @@ def to_markdown(medium_tag):
         list_text = '\n'.join(['{0}. {1}'.format(i + 1, strip_space(li_tags[i].text))
                                for i in range(len(li_tags))])
         return list_text
-    elif medium_tag.name == 'pre': # code snippet (not inline code or embed code)
-        # TODO: 1. trim all html tags from original root tag
-        # FIXME: this current one can't solve the code tab or original intent format
-        xs = medium_tag.prettify().split('<br/>')
-
-        for i in range(len(xs)):
-            t = BeautifulSoup(xs[i], "html.parser")
+    elif medium_tag.name == 'pre': # code block (not inline code or embed code)
+        code_block = ''
+        code_tags = medium_tag.prettify().split('<br/>')
+        for i in range(len(code_tags)):
+            t = BeautifulSoup(code_tags[i], "html.parser")
             code = re.sub(r'\r\n(\s{10})', '', t.text).replace('\n', '')
-            print(i, code)
-        # print(repr(medium_tag.prettify()))
-        # print(medium_tag.text)
-        code_snippet = ''
-        for child in medium_tag.children:
-            code = strip_space(str(child.string))
-            if child.name is None: # plain text
-                code_snippet += code
-                pass
-            elif child.name == 'br': # new line
-                code_snippet += '\n'
-                pass
-            elif child.name == 'strong': # bold
-                code_snippet += '{} '.format(code)
-                pass
-            elif child.name == 'em': # comment
-                pass
-
-            # print(child.name, strip_space(str(child.string)))
-        # return code_snippet
-        # print(code_snippet)
+            code_block += '{}\n'.format(code)
+            # print(i, code)
+        # print(code_block)
+        return code_block
     elif medium_tag.name == 'hr':
         return '\n----\n'
     elif medium_tag.name == 'iframe':
