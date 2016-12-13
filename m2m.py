@@ -111,12 +111,15 @@ def to_markdown(medium_tag):
         driver.get(iframe_url)
         iframe_content = BeautifulSoup(driver.page_source, HTML_PARSER)
 
-
         tag = iframe_content.find('div', class_='gist-meta')
         if tag is not None:
-            gist_tags = tag.find_all('a', href=re.compile(r'gist.github.com'))
-            # for a in gist_tags:
-            #     print(a['href'])
+            gist_raw_link = tag.find('a', href=re.compile(r'gist.github.com(.*)/raw/'))
+            if gist_raw_link is not None:
+                # print(gist_raw_link['href'])
+                req = requests.get(gist_raw_link['href'])
+                if req.status_code == 200:
+                    code_html = BeautifulSoup(req.content, HTML_PARSER)
+                    return '\n```\n{}\n```\n\n'.format(code_html.prettify())
     elif medium_tag.name == 'a':
         # print(medium_tag.prettify())
         pass
