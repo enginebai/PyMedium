@@ -131,3 +131,5 @@ atlassian-ide-plugin.xml
 
 # Driver
 driver/
+
+output/
