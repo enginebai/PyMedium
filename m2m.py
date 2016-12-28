@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+import json
 import requests
+import sys
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -108,18 +110,22 @@ def to_markdown(medium_tag):
     elif medium_tag.name == 'iframe':
         # gist, video, github, link...etc.
         iframe_url = MEDIUM_ROOT + medium_tag['data-src']
-        driver.get(iframe_url)
-        iframe_content = BeautifulSoup(driver.page_source, HTML_PARSER)
+        try:
+            driver.get(iframe_url)
+            iframe_content = BeautifulSoup(driver.page_source, HTML_PARSER)
+            tag = iframe_content.find('div', class_='gist-meta')
+            if tag is not None:
+                gist_raw_link = tag.find('a', href=re.compile(r'gist.github.com(.*)/raw/'))
+                if gist_raw_link is not None:
+                    # print(gist_raw_link['href'])`
+                    req = requests.get(gist_raw_link['href'])
+                    if req.status_code == 200:
+                        code_html = BeautifulSoup(req.content, HTML_PARSER)
+                        return '\n```\n{}\n```\n\n'.format(code_html.prettify())
+        except Exception:
+            print("[ERROR] Failed to parse the embed link.")
+            # print(e)
 
-        tag = iframe_content.find('div', class_='gist-meta')
-        if tag is not None:
-            gist_raw_link = tag.find('a', href=re.compile(r'gist.github.com(.*)/raw/'))
-            if gist_raw_link is not None:
-                # print(gist_raw_link['href'])
-                req = requests.get(gist_raw_link['href'])
-                if req.status_code == 200:
-                    code_html = BeautifulSoup(req.content, HTML_PARSER)
-                    return '\n```\n{}\n```\n\n'.format(code_html.prettify())
     elif medium_tag.name == 'a':
         # print(medium_tag.prettify())
         pass
@@ -127,10 +133,44 @@ def to_markdown(medium_tag):
         return None
 
 
+def get_medium_test_urls():
+    url = "https://cdnapi.pnd.gs/v2/feeds?limit=100&page=1&sort=popular&sources=medium"
+    medium_req = requests.get(url)
+    medium_urls = []
+    if medium_req.status_code == 200:
+        medium_json = json.loads(medium_req.text)
+        for i in range(len(medium_json)):
+            url = medium_json[i]['source']['absoluteUrl']
+            medium_urls.append(url)
+    return medium_urls
+
+
+
 if __name__ == '__main__':
-    url = 'https://medium.com/dualcores-studio/make-an-android-custom-view-publish-and-open-source-99a3d86df228#.jh09xxid3'
-    # url = 'https://medium.com/@enginebai/this-is-title-115e6d7a89a1#.8ejqpawfi'
-    try:
-        medium2markdown(url, '')
-    finally:
-        driver.close()
+    if len(sys.argv) <= 1:
+        print("[ERROR] Please provide either medium link or markdown file to convert.");
+    else:
+        arg1 = sys.argv[1]
+        if arg1.lower().startswith('http'):
+            if len(sys.argv) == 3:
+                md_path = sys.argv[2]
+            else:
+                md_path = ''
+            try:
+                medium2markdown(arg1, md_path)
+            finally:
+                driver.close()
+
+    # url = 'https://medium.com/dualcores-studio/make-an-android-custom-view-publish-and-open-source-99a3d86df228#.jh09xxid3'
+    # # url = 'https://medium.com/@enginebai/this-is-title-115e6d7a89a1#.8ejqpawfi'
+    # try:
+    #     # medium2markdown(url, '')
+    #     urls = get_medium_test_urls()
+    #     for url in urls:
+    #         print(url)
+    #         try:
+    #             medium2markdown(url, '')
+    #         except Exception as e:
+    #             print(e)
+    # finally:
+    #     driver.close()
