@@ -145,8 +145,7 @@ def get_medium_test_urls():
     return medium_urls
 
 
-
-if __name__ == '__main__':
+def main():
     if len(sys.argv) <= 1:
         print("[ERROR] Please provide either medium link or markdown file to convert.");
     else:
@@ -161,16 +160,21 @@ if __name__ == '__main__':
             finally:
                 driver.close()
 
-    # url = 'https://medium.com/dualcores-studio/make-an-android-custom-view-publish-and-open-source-99a3d86df228#.jh09xxid3'
-    # # url = 'https://medium.com/@enginebai/this-is-title-115e6d7a89a1#.8ejqpawfi'
-    # try:
-    #     # medium2markdown(url, '')
-    #     urls = get_medium_test_urls()
-    #     for url in urls:
-    #         print(url)
-    #         try:
-    #             medium2markdown(url, '')
-    #         except Exception as e:
-    #             print(e)
-    # finally:
-    #     driver.close()
+def test():
+    url = 'https://medium.com/dualcores-studio/make-an-android-custom-view-publish-and-open-source-99a3d86df228#.jh09xxid3'
+    # url = 'https://medium.com/@enginebai/this-is-title-115e6d7a89a1#.8ejqpawfi'
+    try:
+        medium2markdown(url, '')
+        # urls = get_medium_test_urls()
+        # for url in urls:
+        #     print(url)
+        #     try:
+        #         medium2markdown(url, '')
+        #     except Exception as e:
+        #         print(e)
+    finally:
+        driver.close()
+
+if __name__ == '__main__':
+    main()
+    test()
