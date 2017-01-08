@@ -176,5 +176,5 @@ def test():
         driver.close()
 
 if __name__ == '__main__':
-    main()
+    # main()
     test()

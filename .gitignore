@@ -133,3 +133,4 @@ atlassian-ide-plugin.xml
 driver/
 
 output/
+.DS_Store
