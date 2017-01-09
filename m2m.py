@@ -1,10 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import json
 import os
 import re
-import json
-import requests
 import sys
+from urllib import parse
+
+import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -127,8 +129,15 @@ def to_markdown(medium_tag):
             # print(e)
 
     elif medium_tag.name == 'a':
-        # print(medium_tag.prettify())
-        pass
+        if medium_tag.has_attr('class') and 'markup--mixtapeEmbed-anchor' in medium_tag['class']:
+            link_text_tag = medium_tag.strong
+            if link_text_tag is not None:
+                text = strip_space(link_text_tag.text)
+            url = medium_tag.get('href')
+            if 'https://medium.com/r/?url=' in url:
+                url = url.split('url=')[1]
+                url = parse.unquote(url)
+            return '\n[{}]({})\n'.format(text, url)
     else:
         return None
 
@@ -161,8 +170,8 @@ def main():
                 driver.close()
 
 def test():
-    url = 'https://medium.com/dualcores-studio/make-an-android-custom-view-publish-and-open-source-99a3d86df228#.jh09xxid3'
-    # url = 'https://medium.com/@enginebai/this-is-title-115e6d7a89a1#.8ejqpawfi'
+    # url = 'https://medium.com/dualcores-studio/make-an-android-custom-view-publish-and-open-source-99a3d86df228#.jh09xxid3'
+    url = 'https://medium.com/@enginebai/this-is-title-115e6d7a89a1#.8ejqpawfi'
     try:
         medium2markdown(url, '')
         # urls = get_medium_test_urls()

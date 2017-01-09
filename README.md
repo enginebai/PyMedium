@@ -4,11 +4,9 @@
 
 ![](https://raw.githubusercontent.com/enginebai/m2m/master/art/graphic.png)
 
-The `m2m` is a tool to help you convert medium article into markdown format file. It can be used to backup your medium articles or just synchronize your medium to several blog platform.
+The `m2m` is a tool to help you convert medium article into markdown format file. It can be used to backup your medium articles or just synchronize your medium to other several blog platforms.
 
-**Why** is `m2m`? For those people who have several blog platforms, it's a real pain :weary: to write your same article again and again or copy/paste and change the format separately to different platform. The `m2m` is here to solve this problem, once you complete your new medium article, you just use it to export to markdown and import your article. 
-
-> Screenshot
+**Why** is `m2m`? For those people who have several blog platforms, it's a real pain :weary: to write your same article again and again or copy/paste and change the format separately to different platforms. The `m2m` is here to solve this problem, once you complete your new medium article, you just use it to export to markdown and import your article. 
 
 
 ## Installation
@@ -27,13 +25,27 @@ From medium to markdown:
 $ m2m http://medium.com/enginebai/blog1 ./output/blog1.md
 ```
 
+Or export markdown file with default article title:
+
+```shell
+$ m2m http://medium.com/enginebai/blog1
+```
 
 
 ## Supported medium format
-#### Header1, header2, plain / bold / italic text, link, quote, separator
-#### Ordered and bulleted list
-#### Image and comment
-#### Code block, inline code, gist
+The most common format of text on medium is supported by `m2m`, however, medium provides rich embed content more than `m2m` can support, just make sure your **embed contents** are not missing after conversion yet or you can append the link manually.
+
+The following is supported format:
+
+* Plain text.
+* Header1, header2.
+* Bold, italic.
+* Link, embed link.
+* Quote.
+* Separator.
+* Ordered and bulleted list.
+* Image 
+* Inline code, code block, gist.
 
 ## License
 
