@@ -47,6 +47,8 @@ The following is supported format:
 * Image 
 * Inline code, code block, gist.
 
+> The full list you can check on [wiki](https://github.com/enginebai/m2m/wiki/Medium-supported-format-demo) page. 
+
 ## License
 
         The MIT License (MIT)
