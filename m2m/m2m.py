@@ -18,25 +18,49 @@ DEFAULT_DIR = "output"
 driver = webdriver.Remote(command_executor='http://127.0.0.1:4444/wd/hub',
                           desired_capabilities=DesiredCapabilities.HTMLUNITWITHJS)
 
+MD = "md"
+HTML = "html"
+TEXT = "text"
 
-def medium2markdown(url, md_path):
+
+def convert(url, output_path='', format=MD):
     driver.get(url)
     title_tag = driver.find_element_by_tag_name('title')
     title = BeautifulSoup(title_tag.get_attribute('innerHTML'), HTML_PARSER).text.strip()
     content_tag = driver.find_element_by_class_name('postArticle-content')
-    content_html = BeautifulSoup(content_tag.get_attribute('innerHTML'), HTML_PARSER).find_all()
+    bs = BeautifulSoup(content_tag.get_attribute("innerHTML"), HTML_PARSER)
+    content_html = bs.find_all()
 
-    if md_path is None or len(md_path) == 0:
+    if output_path is None or len(output_path) == 0:
         if not os.path.exists(DEFAULT_DIR):
             os.mkdir(DEFAULT_DIR)
-        md_path = os.path.join(DEFAULT_DIR, title + ".md")
-    with open(md_path, 'w') as md_file:
-        for i in range(0, len(content_html)):
-            tag = content_html[i]
-            md = to_markdown(tag)
-            if md is not None:
-                print(md, file=md_file)
-                print(md)
+
+        if format == MD:
+            extension = ".md"
+        elif format == HTML:
+            extension = ".html"
+        elif format == TEXT:
+            extension = ".txt"
+        else:
+            extension = ''
+        output_path = os.path.join(DEFAULT_DIR, title + extension)
+
+    with open(output_path, 'w') as file:
+        if format == MD:
+            for i in range(0, len(content_html)):
+                tag = content_html[i]
+                md = to_markdown(tag)
+                if md is not None:
+                    print(md, file=file)
+                    print(md)
+        elif format == HTML:
+            print(content_html, file=file)
+            print(content_html)
+            pass
+        elif format == TEXT:
+            print(bs.text.strip(), file=file)
+            print(bs.text.strip())
+            pass
 
 
 def output_file(content_html):
@@ -154,6 +178,7 @@ def get_medium_test_urls():
     return medium_urls
 
 
+
 def main():
     if len(sys.argv) <= 1:
         print("[ERROR] Please provide either medium link or markdown file to convert.");
@@ -165,15 +190,16 @@ def main():
             else:
                 md_path = ''
             try:
-                medium2markdown(arg1, md_path)
+                convert(arg1, md_path)
             finally:
                 driver.close()
+
 
 def test():
     # url = 'https://medium.com/dualcores-studio/make-an-android-custom-view-publish-and-open-source-99a3d86df228#.jh09xxid3'
     url = 'https://medium.com/@enginebai/this-is-title-115e6d7a89a1#.8ejqpawfi'
     try:
-        medium2markdown(url, '')
+        convert(url, format=TEXT)
         # urls = get_medium_test_urls()
         # for url in urls:
         #     print(url)

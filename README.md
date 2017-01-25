@@ -6,7 +6,7 @@
 
 The `m2m` is a tool to help you convert medium article into markdown format file. It can be used to backup your medium articles or just synchronize your medium to other several blog platforms.
 
-**Why** is `m2m`? For those people who have several blog platforms, it's a real pain :weary: to write your same article again and again or copy/paste and change the format separately to different platforms. The `m2m` is here to solve this problem, once you complete your new medium article, you just use it to export to markdown and import your article. 
+**Why** is `m2m`? For those people who have several blog platforms, it's a real pain :weary: to write your same article again and again or copy/paste and change the format separately to different platforms. The `m2m` is here to solve this problem, once you complete your new medium article, you just use it to export to markdown and import your article to those platforms. 
 
 
 ## Installation
