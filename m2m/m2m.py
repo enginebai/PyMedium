@@ -23,6 +23,20 @@ HTML = "html"
 TEXT = "text"
 
 
+def get_public_posts(username):
+    url = 'https://medium.com/@{0}/latest'.format(username)
+    header = {"Accept": "application/json"}
+    req = requests.get(url, headers=header)
+    if req.status_code == requests.codes.ok:
+        print(req.text)
+
+
+def get_article_list():
+    driver.get('https://medium.com/_/api/users/17756313f41a/profile/stream?limit=8&to=1480845537626&source=latest&page=1')
+    bs = BeautifulSoup(driver.page_source, HTML_PARSER)
+    print(bs)
+
+
 def convert(url, output_path='', format=MD):
     driver.get(url)
     title_tag = driver.find_element_by_tag_name('title')
@@ -212,4 +226,5 @@ def test():
 
 if __name__ == '__main__':
     # main()
-    test()
+    # test()
+    get_public_posts("enginebai")

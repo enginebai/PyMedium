@@ -19,18 +19,23 @@ $ pip install m2m
 > Download selenium driver and start it.
 
 ## Usage
-From medium to markdown:
+### Medium CLI Tool:
+
+* You can convert from medium to markdown file by default:
 
 ```shell
 $ m2m http://medium.com/enginebai/blog1 ./output/blog1.md
 ```
 
-Or export markdown file with default article title:
+* Or export to markdown file with default article title:
 
 ```shell
 $ m2m http://medium.com/enginebai/blog1
 ```
 
+#### Medium GET API:
+
+* Now you can get 
 
 ## Supported medium format
 The most common format of text on medium is supported by `m2m`, however, medium provides rich embed content more than `m2m` can support, just make sure your **embed contents** are not missing after conversion yet or you can append the link manually.
