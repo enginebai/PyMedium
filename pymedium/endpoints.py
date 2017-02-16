@@ -2,13 +2,14 @@
 # -*- encoding: utf-8 -*-
 
 import json
-import http
 
 from flask import Flask, jsonify, Response
 import requests
 
 ROOT_URL = "https://medium.com/"
-EXCEPE_STR = "])}while(1);</x>"
+ESCAPE_CHARACTERS = "])}while(1);</x>"
+ACCEPT_HEADER = {"Accept": "application/json"}
+
 app = Flask(__name__)
 
 
@@ -19,18 +20,17 @@ def index():
 
 @app.route("/<username>", methods=["GET"])
 def get_user_posts(username, count=10):
-    payload = {"count": count}
-    accept_header = {"Accept": "application/json"}
-    req = requests.get(ROOT_URL + "@{0}/latest".format(username),
-                       headers=accept_header,
-                       params=payload)
-    if req.status_code == requests.codes.ok:
-        req_text = req.text.replace(EXCEPE_STR, "").strip()
-        response_dict = json.loads(req_text)
-        post_dict = response_dict.get("payload").get("references").get("Post")
-        return jsonify(post_dict)
-    else:
-        return Response(status=req.status_code)
+    return send_request(ROOT_URL + "@{0}/latest".format(username), param={"count": count})
+
+
+@app.route("/top")
+def get_top_posts():
+    return send_request(ROOT_URL + "browse/top")
+
+
+@app.route("/tags/<tag_name>", methods=["GET"])
+def get_posts_by_tag(tag_name):
+    return send_request(ROOT_URL + "tag/{tag}/latest".format(tag=tag_name))
 
 
 @app.route("/posts/<post_id>", methods=["GET"])
@@ -38,14 +38,22 @@ def get_post(post_id):
     pass
 
 
-@app.route("/top")
-def get_top_posts():
-    pass
+def send_request(url, headers=ACCEPT_HEADER, param=None):
+    req = requests.get(url, headers=headers, params=param)
+    if req.status_code == requests.codes.ok:
+        post_dict = parse_post(req.text)
+        return jsonify(post_dict)
+    else:
+        return Response(status=req.status_code)
 
 
-@app.route("/tags/<tag_name>", methods=["GET"])
-def get_posts_by_tag(tag_name):
-    pass
+def parse_post(request_text):
+    req_text = request_text.replace(ESCAPE_CHARACTERS, "").strip()
+    response_dict = json.loads(req_text)
+    post_dict = response_dict.get("payload").get("references").get("Post")
+    print(post_dict)
+    app.logger.debug(post_dict)
+    return post_dict
 
 
 if __name__ == "__main__":
