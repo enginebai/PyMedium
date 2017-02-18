@@ -30,7 +30,8 @@ def get_top_posts():
 
 @app.route("/tags/<tag_name>", methods=["GET"])
 def get_posts_by_tag(tag_name):
-    return send_request(ROOT_URL + "tag/{tag}/latest".format(tag=tag_name))
+    return send_request(ROOT_URL + "tag/{tag}/latest".format(tag=tag_name),
+                        parse_keys=("payload", "value"))
 
 
 @app.route("/posts/<post_id>", methods=["GET"])
@@ -38,21 +39,30 @@ def get_post(post_id):
     pass
 
 
-def send_request(url, headers=ACCEPT_HEADER, param=None):
+def send_request(url, headers=ACCEPT_HEADER, param=None, parse_keys=None):
     req = requests.get(url, headers=headers, params=param)
     if req.status_code == requests.codes.ok:
-        post_dict = parse_post(req.text)
+        if parse_keys is not None:
+            post_dict = parse_post_by_keys(req.text, parse_keys)
+        else:
+            post_dict = parse_post(req.text)
         return jsonify(post_dict)
     else:
         return Response(status=req.status_code)
 
 
 def parse_post(request_text):
+    return parse_post_by_keys(request_text, ("payload", "references", "Post"))
+
+
+def parse_post_by_keys(request_text, keys):
     req_text = request_text.replace(ESCAPE_CHARACTERS, "").strip()
+    print(req_text)
     response_dict = json.loads(req_text)
-    post_dict = response_dict.get("payload").get("references").get("Post")
-    print(post_dict)
-    app.logger.debug(post_dict)
+    post_dict =response_dict
+    for key in keys:
+        post_dict = post_dict.get(key)
+        print(post_dict)
     return post_dict
 
 
