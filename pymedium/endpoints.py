@@ -3,7 +3,7 @@
 
 import json
 
-from flask import Flask, jsonify, Response
+from flask import Flask, jsonify, Response, request
 import requests
 
 ROOT_URL = "https://medium.com/"
@@ -29,7 +29,13 @@ def get_top_posts():
 
 
 @app.route("/tags/<tag_name>", methods=["GET"])
-def get_posts_by_tag(tag_name):
+def get_top_posts_by_tag(tag_name):
+    return send_request(ROOT_URL + "tag/{tag}".format(tag=tag_name),
+                        parse_keys=("payload", "value"))
+
+
+@app.route("/tags/<tag_name>/latest", methods=["GET"])
+def get_latest_posts_by_tag(tag_name):
     return send_request(ROOT_URL + "tag/{tag}/latest".format(tag=tag_name),
                         parse_keys=("payload", "value"))
 
