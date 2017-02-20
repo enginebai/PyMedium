@@ -19,8 +19,13 @@ def index():
 
 
 @app.route("/<username>", methods=["GET"])
+def get_user_profile(username):
+    return send_request(ROOT_URL + "@{0}/latest".format(username), parse_function=parse_user)
+
+
+@app.route("/<username>/posts", methods=["GET"])
 def get_user_posts(username, count=10):
-    return send_request(ROOT_URL + "@{0}/latest".format(username), param={"count": count}, parse_function=parse_user)
+    return send_request(ROOT_URL + "@{0}/latest".format(username), parse_function=parse_post)
 
 
 @app.route("/top")
@@ -82,7 +87,33 @@ def parse_user(payload):
 
 
 def parse_post(payload):
-    pass
+    post_list_dict = payload["payload"]["references"]["Post"]
+    post_list = []
+    for post_id in post_list_dict.keys():
+        post_dict = post_list_dict.get(post_id)
+        title = post_dict["title"]
+        subtitle = post_dict["content"]["subtitle"]
+        post_date = post_dict["createdAt"]
+        publication_id = post_dict["approvedHomeCollectionId"]
+
+        # TODO: url
+
+        virtual_dict = post_dict["virtuals"]
+        recommend_count = virtual_dict["recommends"]
+        response_count = virtual_dict["responsesCreatedCount"]
+        read_time = virtual_dict["readingTime"]
+        word_count = virtual_dict["wordCount"]
+        image_count = virtual_dict["imageCount"]
+        preview_image = virtual_dict["previewImage"]
+        post_tags = virtual_dict["tags"]
+
+        pagination = payload["payload"]["paging"]
+
+        print("{id}, {title}, {subtitle}, {date}\n{recommend}, {response}, {read}, {word}, {image}"
+              .format(id=post_id, title=title, subtitle=subtitle, date=post_date,
+                      recommend=recommend_count, response=response_count, read=read_time,
+                      word=word_count, image=image_count))
+        return pagination
 
 
 @app.route("/posts/<post_id>", methods=["GET"])
@@ -91,4 +122,4 @@ def get_post(post_id):
 
 
 if __name__ == "__main__":
-    get_user_posts("enginebai")
+    get_user_profile("enginebai")
