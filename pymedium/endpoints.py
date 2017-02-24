@@ -3,8 +3,10 @@
 
 import json
 
-from flask import Flask, jsonify, Response, request
+from flask import Flask, jsonify, Response
 import requests
+
+from .model import Post
 
 ROOT_URL = "https://medium.com/"
 ESCAPE_CHARACTERS = "])}while(1);</x>"
@@ -70,6 +72,7 @@ def parse_user(payload):
     user_meta_dict = payload["payload"]["userMeta"]
     interest_tags = user_meta_dict["interestTags"]
     author_tags = user_meta_dict["authorTags"]
+    publication_ids = user_meta_dict["collectionIds"]
 
     ref_dict = payload["payload"]["references"]
     publications = ref_dict["Collection"]
@@ -92,28 +95,46 @@ def parse_user(payload):
 
 
 def parse_post_from_search_by_tags(payload):
-    return parse_post_detail(payload["payload"]["value"])
+    return parse_post_detail(payload, ("payload", "value"))
 
 
 def parse_post(payload):
-    return parse_post_detail(payload["payload"]["references"]["Post"])
+    return parse_post_detail(payload, ("payload", "references", "Post"))
 
 
-def parse_post_detail(post_list_payload):
+def parse_post_detail(payload, post_detail_keys):
+    if post_detail_keys is None:
+        return
+    post_list_payload = payload
+    for key in post_detail_keys:
+        post_list_payload = post_list_payload.get(key)
 
     def parse_post_dict(post_dict):
-        # print(post_id)
+        post_id = post_dict["id"]
+        unique_slug = post_dict["uniqueSlug"]
         title = post_dict["title"]
         print(title)
         post_date = post_dict["createdAt"]
+
         # print(post_date)
         publication_id = post_dict["approvedHomeCollectionId"]
 
-        # TODO: url
-        if publication_id is None:
-            pass
+        url = ROOT_URL
+        ref_dict = payload["payload"]["references"]
+        if publication_id is not None and publication_id:
+            publication_dict = ref_dict["Collection"][publication_id]
+            # custom publication domain
+            if "domain" in publication_dict and publication_dict["domain"]:
+                url = "https://" + publication_dict["domain"]
+            else:
+                # simple publication
+                url += publication_dict["slug"]
         else:
-            pass
+            # personal post, no publication
+            creator_id = post_dict["creatorId"]
+            username = ref_dict["User"][creator_id]["username"]
+            url += "@{username}".format(username=username)
+        url += "/{path}".format(path=unique_slug)
 
         virtual_dict = post_dict["virtuals"]
         recommend_count = virtual_dict["recommends"]
@@ -132,12 +153,15 @@ def parse_post_detail(post_list_payload):
         # print("{id}, {title}".format(id=post_id, title=title))
         # print("{recommend}, {response}, {read}".format(
         # recommend=recommend_count, response=response_count, read=read_time))
+        return Post(title, url).__dict__
 
     post_list = []
+    # payload -> references -> Post
     if type(post_list_payload) is dict:
         for post_id in post_list_payload.keys():
             post_dict = post_list_payload.get(post_id)
             post_list.append(parse_post_dict(post_dict))
+    # payload -> value
     elif type(post_list_payload) is list:
         for post_dict in post_list_payload:
             post_list.append(parse_post_dict(post_dict))
