@@ -6,7 +6,7 @@ import json
 from flask import Flask, jsonify, Response
 import requests
 
-from .model import Post
+from .model import Post, User
 
 ROOT_URL = "https://medium.com/"
 ESCAPE_CHARACTERS = "])}while(1);</x>"
@@ -49,7 +49,7 @@ def get_latest_posts_by_tag(tag_name):
 
 def send_request(url, headers=ACCEPT_HEADER, param=None, parse_function=None):
     req = requests.get(url, headers=headers, params=param)
-    req.encoding = "utf-8"
+    req.encoding = "utf8"
     if req.status_code == requests.codes.ok:
         if parse_function is None:
             parse_function = parse_post
@@ -62,12 +62,13 @@ def send_request(url, headers=ACCEPT_HEADER, param=None, parse_function=None):
 def parse_user(payload):
     user_dict = payload["payload"]["user"]
     user_id = user_dict["userId"]
+    user = User(user_id)
     username = user_dict["username"]
     display_name = user_dict["name"]
     avatar = user_dict["imageId"]
     bio = user_dict["bio"]
     twitter_name = user_dict["twitterScreenName"]
-    facebook_name = user_dict["facebookAccountId"]
+    facebook_id = user_dict["facebookAccountId"]
 
     user_meta_dict = payload["payload"]["userMeta"]
     interest_tags = user_meta_dict["interestTags"]
@@ -77,21 +78,25 @@ def parse_user(payload):
     ref_dict = payload["payload"]["references"]
     publications = ref_dict["Collection"]
 
+    # TODO: parse publication information
+
     stats_dict = ref_dict["SocialStats"][user_id]
     following_count = stats_dict["usersFollowedCount"]
     followby_count = stats_dict["usersFollowedByCount"]
 
-    print("{id}, {name}, {display_name}, {avatar}\n{bio}\n{twitter}, {facebook}, {following}, {follower}"
-          .format(id=user_id,
-                  name=username,
-                  display_name=display_name,
-                  avatar=avatar,
-                  bio=bio,
-                  twitter=twitter_name,
-                  facebook=facebook_name,
-                  following=following_count,
-                  follower=followby_count))
-    return publications
+    user.user_id = user_id
+    user.username = username
+    user.display_name = display_name
+    user.avatar = avatar
+    user.bio = bio
+    user.twitter = twitter_name
+    user.facebook = facebook_id
+    user.following_count = following_count
+    user.followedby_count = followby_count
+    user.interest_tags = interest_tags
+    user.author_tags = author_tags
+    user.publications = publications
+    return user.__dict__
 
 
 def parse_post_from_search_by_tags(payload):
@@ -111,9 +116,9 @@ def parse_post_detail(payload, post_detail_keys):
 
     def parse_post_dict(post_dict):
         post_id = post_dict["id"]
+        post = Post(post_id)
         unique_slug = post_dict["uniqueSlug"]
         title = post_dict["title"]
-        print(title)
         post_date = post_dict["createdAt"]
 
         # print(post_date)
@@ -134,26 +139,33 @@ def parse_post_detail(payload, post_detail_keys):
             creator_id = post_dict["creatorId"]
             username = ref_dict["User"][creator_id]["username"]
             url += "@{username}".format(username=username)
-        url += "/{path}".format(path=unique_slug)
+        url += u"/{path}".format(path=unique_slug)
 
         virtual_dict = post_dict["virtuals"]
         recommend_count = virtual_dict["recommends"]
-        # print(recommend_count)
         response_count = virtual_dict["responsesCreatedCount"]
-        # print(response_count)
         read_time = virtual_dict["readingTime"]
-        # print(read_time)
         word_count = virtual_dict["wordCount"]
-        # print(word_count)
         image_count = virtual_dict["imageCount"]
-        # print(image_count)
         preview_image = virtual_dict["previewImage"]
         post_tags = virtual_dict["tags"]
+
+        post.unique_slug = unique_slug
+        post.title = title
+        post.post_date = post_date
+        post.url = url
+        post.recommend_count = recommend_count
+        post.response_count = response_count
+        post.read_time = read_time
+        post.word_count = word_count
+        post.image_count = image_count
+        post.preview_image = preview_image
+        post.post_tags = post_tags
 
         # print("{id}, {title}".format(id=post_id, title=title))
         # print("{recommend}, {response}, {read}".format(
         # recommend=recommend_count, response=response_count, read=read_time))
-        return Post(title, url).__dict__
+        return post.__dict__
 
     post_list = []
     # payload -> references -> Post
