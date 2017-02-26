@@ -189,11 +189,133 @@ class Post:
         self.post_tags = tags
 
 
-# TODO: get publication information
 class Publication:
-    pass
+    def __init__(self, publication_id):
+        self.publication_id = publication_id
+
+    @property
+    def name(self):
+        return self.name
+
+    @name.setter
+    def name(self, name):
+        self.name = name
+
+    @property
+    def unique_slug(self):
+        return self.unique_slug
+
+    @unique_slug.setter
+    def unique_slug(self, slug):
+        self.unique_slug = slug
+
+    @property
+    def creator_user_id(self):
+        return self.creator_user_id
+
+    @creator_user_id.setter
+    def creator_user_id(self, user_id):
+        self.creator_user_id = user_id
+
+    @property
+    def description(self):
+        return self.description
+
+    @description.setter
+    def description(self, description):
+        self.description = description
+
+    @property
+    def image(self):
+        return self.image
+
+    @image.setter
+    def image(self, image):
+        self.image = image
+
+    @property
+    def logo(self):
+        return self.logo
+
+    @logo.setter
+    def logo(self, logo):
+        self.logo = logo
+
+    @property
+    def follower_count(self):
+        return self.follower_count
+
+    @follower_count.setter
+    def follower_count(self, count):
+        self.follower_count = count
 
 
-# TODO: define tags model
 class Tag:
-    pass
+    @property
+    def unique_slug(self):
+        return self.unique_slug
+
+    @unique_slug.setter
+    def unique_slug(self, slug):
+        self.unique_slug = slug
+
+    @property
+    def name(self):
+        return self.name
+
+    @name.setter
+    def name(self, name):
+        self.name = name
+
+    @property
+    def post_count(self):
+        return self.post_count
+
+    @post_count.setter
+    def post_count(self, count):
+        self.post_count = count
+
+    @property
+    def follower_count(self):
+        return self.follower_count
+
+    @follower_count.setter
+    def follower_count(self, count):
+        self.follower_count = count
+
+    @property
+    def image(self):
+        return self.image
+
+    @image.setter
+    def image(self, image):
+        self.image = image
+
+
+class Image:
+    def __init__(self, image_id):
+        self.image_id = image_id
+
+    @property
+    def original_height(self):
+        return self.original_height
+
+    @original_height.setter
+    def original_height(self, height):
+        self.original_height = height
+
+    @property
+    def original_width(self):
+        return self.original_width
+
+    @original_width.setter
+    def original_width(self, width):
+        self.original_width = width
+
+    @property
+    def url(self):
+        return self.url
+
+    @url.setter
+    def url(self, url):
+        self.url = url

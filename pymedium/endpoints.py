@@ -6,7 +6,7 @@ import json
 from flask import Flask, jsonify, Response
 import requests
 
-from .model import Post, User
+from .model import *
 
 ROOT_URL = "https://medium.com/"
 ESCAPE_CHARACTERS = "])}while(1);</x>"
@@ -72,13 +72,27 @@ def parse_user(payload):
 
     user_meta_dict = payload["payload"]["userMeta"]
     interest_tags = user_meta_dict["interestTags"]
+    user.interest_tags = parse_tags(interest_tags)
     author_tags = user_meta_dict["authorTags"]
+    user.author_tags = parse_tags(author_tags)
     publication_ids = user_meta_dict["collectionIds"]
 
     ref_dict = payload["payload"]["references"]
-    publications = ref_dict["Collection"]
-
-    # TODO: parse publication information
+    if publication_ids is not None and len(publication_ids) > 0:
+        publication_list = []
+        for pub_id in publication_ids:
+            publication_dict = ref_dict["Collection"][pub_id]
+            publication = Publication(pub_id)
+            publication.name = publication_dict["name"]
+            publication.unique_slug = publication_dict["slug"]
+            publication.description = publication_dict["description"]
+            image_dict = publication_dict["image"]
+            publication.image = parse_images(image_dict)
+            logo_dict = publication_dict["logo"]
+            publication.logo = parse_images(logo_dict)
+            publication.follower_count = publication_dict["metadata"]["followerCount"]
+            publication_list.append(publication.__dict__)
+        user.publications = publication_list
 
     stats_dict = ref_dict["SocialStats"][user_id]
     following_count = stats_dict["usersFollowedCount"]
@@ -93,9 +107,6 @@ def parse_user(payload):
     user.facebook = facebook_id
     user.following_count = following_count
     user.followedby_count = followby_count
-    user.interest_tags = interest_tags
-    user.author_tags = author_tags
-    user.publications = publications
     return user.__dict__
 
 
@@ -159,8 +170,8 @@ def parse_post_detail(payload, post_detail_keys):
         post.read_time = read_time
         post.word_count = word_count
         post.image_count = image_count
-        post.preview_image = preview_image
-        post.post_tags = post_tags
+        post.preview_image = parse_images(preview_image)
+        post.post_tags = parse_tags(post_tags)
 
         # print("{id}, {title}".format(id=post_id, title=title))
         # print("{recommend}, {response}, {read}".format(
@@ -178,6 +189,33 @@ def parse_post_detail(payload, post_detail_keys):
         for post_dict in post_list_payload:
             post_list.append(parse_post_dict(post_dict))
     return post_list
+
+
+def parse_tags(tags_list_dict):
+    if tags_list_dict is not None and len(tags_list_dict) > 0:
+        tags_list = []
+        for tag_dict in tags_list_dict:
+            tag = Tag()
+            tag.unique_slug = tag_dict["slug"]
+            tag.name = tag_dict["name"]
+            tag.post_count = tag_dict["postCount"]
+            metadata_dict = tag_dict["metadata"]
+            if metadata_dict is not None:
+                tag.follower_count = metadata_dict["followerCount"]
+            tags_list.append(tag.__dict__)
+        return tags_list
+
+
+def parse_images(image_dict):
+    if image_dict is not None:
+        image = Image(image_dict["imageId"] if "imageId" in image_dict else image_dict["id"])
+        image.original_width = image_dict["originalWidth"]
+        image.original_height = image_dict["originalHeight"]
+        image.url = u"https://cdn-images-1.medium.com/fit/t/{width}/{height}/{id}"\
+            .format(width=image.original_width,
+                    height=image.original_height,
+                    id=image.image_id)
+        return image.__dict__
 
 
 @app.route("/posts/<post_id>", methods=["GET"])
