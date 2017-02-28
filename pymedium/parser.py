@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 from .model import User, Post, Publication, Tag, Image
-from .api import ROOT_URL
 
 __author__ = 'enginebai'
+
+ROOT_URL = "https://medium.com/"
 
 
 def parse_user(payload):
@@ -57,15 +58,12 @@ def parse_user(payload):
     return user.__dict__
 
 
-def parse_post_from_search_by_tags(payload):
-    return parse_post_detail(payload, ("payload", "value"))
-
-
 def parse_post(payload):
     return parse_post_detail(payload, ("payload", "references", "Post"))
 
 
 def parse_post_detail(payload, post_detail_keys):
+    print(payload)
     if post_detail_keys is None:
         return
     post_list_payload = payload
@@ -127,6 +125,7 @@ def parse_post_detail(payload, post_detail_keys):
 
     post_list = []
     # payload -> references -> Post
+    print(post_list_payload)
     if type(post_list_payload) is dict:
         for post_id in post_list_payload.keys():
             post_dict = post_list_payload.get(post_id)

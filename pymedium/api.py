@@ -5,7 +5,7 @@ import json
 
 from flask import Flask, jsonify, Response
 import requests
-from .parser import *
+from .parser import parse_user, parse_post
 
 ROOT_URL = "https://medium.com/"
 ESCAPE_CHARACTERS = "])}while(1);</x>"
@@ -26,24 +26,22 @@ def get_user_profile(username):
 
 @app.route("/<username>/posts", methods=["GET"])
 def get_user_posts(username):
-    return send_request(ROOT_URL + "@{0}/latest".format(username), parse_function=parse_post)
+    return process_post_request(ROOT_URL + "@{0}/latest".format(username))
 
 
 @app.route("/top")
 def get_top_posts():
-    return send_request(ROOT_URL + "browse/top", parse_function=parse_post)
+    return process_post_request(ROOT_URL + "browse/top")
 
 
 @app.route("/tags/<tag_name>", methods=["GET"])
 def get_top_posts_by_tag(tag_name):
-    return send_request(ROOT_URL + "tag/{tag}".format(tag=tag_name),
-                        parse_function=parse_post_from_search_by_tags)
+    return process_post_request(ROOT_URL + "tag/{tag}".format(tag=tag_name))
 
 
 @app.route("/tags/<tag_name>/latest", methods=["GET"])
 def get_latest_posts_by_tag(tag_name):
-    return send_request(ROOT_URL + "tag/{tag}/latest".format(tag=tag_name),
-                        parse_function=parse_post_from_search_by_tags)
+    return process_post_request(ROOT_URL + "tag/{tag}/latest".format(tag=tag_name))
 
 
 def send_request(url, headers=ACCEPT_HEADER, param=None, parse_function=None):
@@ -56,6 +54,10 @@ def send_request(url, headers=ACCEPT_HEADER, param=None, parse_function=None):
         return jsonify(model_dict)
     else:
         return Response(status=req.status_code)
+
+
+def process_post_request(url):
+    return send_request(url, parse_function=parse_post)
 
 
 @app.route("/posts/<post_id>", methods=["GET"])

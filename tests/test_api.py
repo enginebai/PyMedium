@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # -*- encoding: utf-8 -*-
-import requests
 import json
+import unittest
+
+import requests
 
 ROOT = "http://localhost:5000/"
 
