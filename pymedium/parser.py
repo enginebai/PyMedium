@@ -19,13 +19,14 @@ def parse_user(payload):
     facebook_id = user_dict["facebookAccountId"]
 
     user_meta_dict = payload["payload"]["userMeta"]
-    interest_tags = user_meta_dict["interestTags"]
-    user.interest_tags = parse_tags(interest_tags)
-    author_tags = user_meta_dict["authorTags"]
-    user.author_tags = parse_tags(author_tags)
-    publication_ids = user_meta_dict["collectionIds"]
-
     ref_dict = payload["payload"]["references"]
+
+    # interest_tags = user_meta_dict["interestTags"]
+    # user.interest_tags = parse_tags(interest_tags)
+    # author_tags = user_meta_dict["authorTags"]
+    # user.author_tags = parse_tags(author_tags)
+
+    publication_ids = user_meta_dict["collectionIds"]
     if publication_ids is not None and len(publication_ids) > 0:
         publication_list = []
         for pub_id in publication_ids:
@@ -104,7 +105,8 @@ def parse_post_detail(payload, post_detail_keys):
         word_count = virtual_dict["wordCount"]
         image_count = virtual_dict["imageCount"]
         preview_image = virtual_dict["previewImage"]
-        post_tags = virtual_dict["tags"]
+        # post_tags = virtual_dict["tags"]
+        # post.post_tags = parse_tags(post_tags)
 
         post.unique_slug = unique_slug
         post.title = title
@@ -116,7 +118,6 @@ def parse_post_detail(payload, post_detail_keys):
         post.word_count = word_count
         post.image_count = image_count
         post.preview_image = parse_images(preview_image)
-        post.post_tags = parse_tags(post_tags)
 
         # print("{id}, {title}".format(id=post_id, title=title))
         # print("{recommend}, {response}, {read}".format(

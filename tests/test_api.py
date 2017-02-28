@@ -8,79 +8,49 @@ import requests
 ROOT = "http://localhost:5000/"
 
 
-def test_user_api(username):
-    url = ROOT + "{}".format(username)
-    req = requests.get(url)
-    if req.status_code == requests.codes.ok:
-        print(req.text)
-    else:
-        print(req.status_code)
+class ApiTestCase(unittest.TestCase):
+
+    def setUp(self):
+        print("Request top posts...")
+        self.top_req = requests.get(ROOT + "top")
+        print("Request user profile...")
+        self.user_req = requests.get(ROOT + "enginebai")
+        print("Request user posts...")
+        self.user_post_req = requests.get(ROOT + "enginebai/posts")
+        print("Request tag top posts...")
+        self.tag_top_req = requests.get(ROOT + "tags/android")
+        print("Request tag latest posts...")
+        self.tag_latest_req = requests.get(ROOT + "tags/android/latest")
+
+    def test_apis_ok(self):
+        self.assertEqual(self.top_req.status_code, 200)
+        self.assertEqual(self.user_req.status_code, 200)
+        self.assertEqual(self.user_post_req.status_code, 200)
+        self.assertEqual(self.tag_top_req.status_code, 200)
+        self.assertEqual(self.tag_latest_req.status_code, 200)
 
 
-def test_post_api(username=None):
-    url = ROOT + "top"
-    if username is not None and username:
-        url = ROOT + "{username}/posts".format(username=username)
-    req = requests.get(url)
-    ok = 0
-    fail = 0
-    if req.status_code == requests.codes.ok:
-        response_list = json.loads(req.text)
-        for post in response_list:
-            r = requests.get(post["url"])
-            print(post["title"])
-            print(r.status_code, post["url"])
-            if r.status_code == requests.codes.ok:
-                ok += 1
-            else:
-                fail += 1
-    else:
-        print(req.status_code)
-    return ok, fail
+class ApiResponseCase(unittest.TestCase):
 
+    def setUp(self):
+        print("Request user profile...")
+        self.user_req = requests.get(ROOT + "enginebai")
 
-def test_posts_from_user_interest_tags(username):
-    req = requests.get("{}{}".format(ROOT, username))
-    ok = 0
-    fail = 0
-    if req.status_code == requests.codes.ok:
-        user_dict = json.loads(req.text)
-        print(user_dict)
-        test_keys = ("interest_tags", "author_tags")
-        for key in test_keys:
-            if key in user_dict and user_dict[key]:
-                interest_tags = user_dict[key]
-                for tag_dict in interest_tags:
-                    print("Send request to {} tags [{}]".format(key, tag_dict))
-                    url = "{}tags/{}".format(ROOT, tag_dict["unique_slug"])
-                    print("Requsting " + url)
-                    search_by_tag_req = requests.get(url)
-                    if search_by_tag_req.status_code == requests.codes.ok:
-                        print(search_by_tag_req.text)
-                        posts_list = json.loads(search_by_tag_req.text)
-                        print(posts_list)
-                        for post in posts_list:
-                            post_req = requests.get(post["url"])
-                            if post_req.status_code != requests.codes.ok:
-                                fail += 1
-                                raise Exception(tag_dict, post["url"])
-                            else:
-                                ok += 1
-                                print(post_req.status_code, post["title"], post["url"])
-    return ok, fail
+    def test_user_api(self):
+        user_dict = json.loads(self.user_req.text)
+        self.assertIn("username", user_dict.keys())
+        self.assertEqual(user_dict["username"], "enginebai")
 
 
 if __name__ == "__main__":
-    # ok, fail = test_post_api()
-    # print(ok, fail)
-    # https://uxplanet.org/@101
-    # https://blog.magikcraft.io/@sitapati
-    users = ("sitapati", "enginebai", "101", "mobiscroll", "richard.yang.uw", "tzhongg", "jon.moore", "JonDeng",
-             "waymo", "quincylarson", "benjaminhardy", "jsaito", "lindacaroll", "jasonfried")
-    for u in users:
-        # test_user_api(u)
-        ok, fail = test_posts_from_user_interest_tags(u)
-        # ok, fail = test_post_api(u)
-        if fail > 0:
-            raise Exception(u)
-        print(ok, fail)
+    test_classes = [ApiTestCase, ApiResponseCase]
+    loader = unittest.TestLoader()
+
+    suites_list = []
+    for test_class in test_classes:
+        suite = loader.loadTestsFromTestCase(test_class)
+        suites_list.append(suite)
+
+    full_suite = unittest.TestSuite(suites_list)
+    runner = unittest.TextTestRunner()
+    results = runner.run(full_suite)
