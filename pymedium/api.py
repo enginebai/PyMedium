@@ -1,11 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
 import json
 
 import requests
 from flask import Flask, jsonify, Response, request
-from pymedium.parser import parse_user, parse_post
+from pymedium.parser import parse_user, parse_post, parse_post_detail
+from pymedium.model import OutputFormat
 
 ROOT_URL = "https://medium.com/"
 ESCAPE_CHARACTERS = "])}while(1);</x>"
@@ -64,11 +65,11 @@ def process_post_request(url):
     return send_request(url, parse_function=parse_post)
 
 
-@app.route("/posts/<post_id>", methods=["GET"])
-def get_post(post_id):
-    # TODO:
-    pass
-
-
-if __name__ == "__main__":
-    get_post("")
+@app.route("/post", methods=["GET"])
+def get_post():
+    url = request.args.get("url", "")
+    output_format = request.args.get("format", OutputFormat.PLAIN_TEXT.value)
+    if url:
+        return parse_post_detail(url, output_format)
+    else:
+        return url

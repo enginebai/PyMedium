@@ -1,17 +1,17 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf8 -*-
 import json
 import os
 import re
 import sys
-from urllib import parse
+from urllib.parse import unquote
 
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-from .model import User, Post, Publication, Tag, Image
+from .model import User, Post, Publication, Tag, Image, OutputFormat
 
 __author__ = 'enginebai'
 
@@ -75,10 +75,10 @@ def parse_user(payload):
 
 
 def parse_post(payload):
-    return parse_post_detail(payload, ("payload", "references", "Post"))
+    return parse_post_information(payload, ("payload", "references", "Post"))
 
 
-def parse_post_detail(payload, post_detail_keys):
+def parse_post_information(payload, post_detail_keys):
     if post_detail_keys is None:
         return
     post_list_payload = payload
@@ -181,7 +181,15 @@ def parse_images(image_dict):
 
 
 def parse_post_detail(post_url, output_format):
-    pass
+    with webdriver.Remote(desired_capabilities=DesiredCapabilities.HTMLUNITWITHJS) as driver:
+        driver.get(post_url)
+        content_elements = driver.find_element_by_class_name("postArticle-content")
+        content_tags = BeautifulSoup(content_elements.get_attribute("innerHTML"), HTML_PARSER).find_all()
+
+        if output_format == OutputFormat.MARKDOWN.value:
+            return to_markdown(content_tags, driver)
+        else:
+            return ""
 
 
 def strip_space(text, trim_space=True):
@@ -276,7 +284,7 @@ def to_markdown(medium_tag, driver):
             url = medium_tag.get('href')
             if 'https://medium.com/r/?url=' in url:
                 url = url.split('url=')[1]
-                url = parse.unquote(url)
+                url = unquote(url)
             return '\n[{}]({})\n'.format(text, url)
     else:
         return None
