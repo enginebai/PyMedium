@@ -3,9 +3,9 @@
 
 import json
 
-from flask import Flask, jsonify, Response, request
 import requests
-from .parser import parse_user, parse_post
+from flask import Flask, jsonify, Response, request
+from pymedium.parser import parse_user, parse_post
 
 ROOT_URL = "https://medium.com/"
 ESCAPE_CHARACTERS = "])}while(1);</x>"
@@ -71,4 +71,4 @@ def get_post(post_id):
 
 
 if __name__ == "__main__":
-    get_user_profile("enginebai")
+    get_post("")

@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
+from enum import Enum
+
 __author__ = 'enginebai'
 
 
@@ -319,3 +321,10 @@ class Image:
     @url.setter
     def url(self, url):
         self.url = url
+
+
+class OutputFormat(Enum):
+    PLAIN_TEXT = "text"
+    JSON = "json"
+    HTML = "html"
+    MARKDOWN = "md"

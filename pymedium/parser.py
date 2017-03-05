@@ -1,10 +1,22 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
+import json
+import os
+import re
+import sys
+from urllib import parse
+
+import requests
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
 from .model import User, Post, Publication, Tag, Image
 
 __author__ = 'enginebai'
 
 ROOT_URL = "https://medium.com/"
+HTML_PARSER = "html.parser"
 
 
 def parse_user(payload):
@@ -74,7 +86,6 @@ def parse_post_detail(payload, post_detail_keys):
         post_list_payload = post_list_payload.get(key)
 
     def parse_post_dict(post_dict):
-        post_id = post_dict["id"]
         post = Post(post_id)
         unique_slug = post_dict["uniqueSlug"]
         title = post_dict["title"]
@@ -162,8 +173,110 @@ def parse_images(image_dict):
         image = Image(image_dict["imageId"] if "imageId" in image_dict else image_dict["id"])
         image.original_width = image_dict["originalWidth"]
         image.original_height = image_dict["originalHeight"]
-        image.url = u"https://cdn-images-1.medium.com/fit/t/{width}/{height}/{id}"\
+        image.url = u"https://cdn-images-1.medium.com/fit/t/{width}/{height}/{id}" \
             .format(width=image.original_width,
                     height=image.original_height,
                     id=image.image_id)
         return image.__dict__
+
+
+def parse_post_detail(post_url, output_format):
+    pass
+
+
+def strip_space(text, trim_space=True):
+    text = re.sub(r'\s+', ' ', text)
+    if trim_space:
+        return text.strip()
+    else:
+        return text
+
+
+def to_markdown(medium_tag, driver):
+    text = strip_space(medium_tag.text)
+    if medium_tag.name == 'h3':
+        return '\n## {}'.format(text)
+    elif medium_tag.name == 'h4':
+        return '\n### {}'.format(text)
+    elif medium_tag.name == 'p':  # text paragraph
+        # find style, link inside a paragraph
+        plain_text = ''
+        for child in medium_tag.children:
+            if child.name is None:
+                if len(strip_space(child.string)) > 0:
+                    plain_text += strip_space(child.string)
+            else:
+                content = strip_space(child.text)
+                if child.name == 'strong':
+                    plain_text += " **{0}** ".format(content)
+                elif child.name == 'em':
+                    plain_text += " _{0}_ ".format(content)
+                elif child.name == 'a':
+                    plain_text += " [{0}]({1}) ".format(content, child['href'])
+                elif child.name == 'code' or child.name == '':
+                    plain_text += " `{0}` ".format(content)
+        return plain_text
+    elif medium_tag.name == 'figure':  # image and comment
+        img_tag = medium_tag.find('img', class_='progressiveMedia-image')
+        if img_tag is not None and img_tag.has_attr('data-src'):
+            figcaption_tag = medium_tag.find('figcaption')
+            if figcaption_tag is not None:
+                return '\n![{0}]({1})'.format(strip_space(figcaption_tag.text),
+                                              img_tag['data-src'])
+            else:
+                return '\n![]({})'.format(img_tag['data-src'])
+    elif medium_tag.name == 'blockquote':  # quote
+        return '> {}\n'.format(strip_space(medium_tag.text))
+    elif medium_tag.name == 'ul':
+        li_tags = medium_tag.find_all('li')
+        # use newline to join several item lines
+        list_text = '\n'.join(['* {}'.format(strip_space(li.text)) for li in li_tags])
+        return "\n" + list_text + "\n"
+    elif medium_tag.name == 'ol':
+        li_tags = medium_tag.find_all('li')
+        # use newline to join several item lines
+        list_text = '\n'.join(['{0}. {1}'.format(i + 1, strip_space(li_tags[i].text))
+                               for i in range(len(li_tags))])
+        return "\n" + list_text + "\n"
+    elif medium_tag.name == 'pre':  # code block (not inline code or embed code)
+        code_block = ''
+        code_tags = medium_tag.prettify().split('<br/>')
+        for i in range(len(code_tags)):
+            t = BeautifulSoup(code_tags[i], HTML_PARSER)
+            code = re.sub(r'\r\n(\s{10})', '', t.text).replace('\n', '')
+            code_block += '{}\n'.format(code)
+            # print(i, code)
+        return '\n```\n{}```\n\n'.format(code_block)
+    elif medium_tag.name == 'hr':
+        return '\n----\n'
+    elif medium_tag.name == 'iframe':
+        # gist, video, github, link...etc.
+        iframe_url = ROOT_URL + medium_tag['data-src']
+        try:
+            driver.get(iframe_url)
+            iframe_content = BeautifulSoup(driver.page_source, HTML_PARSER)
+            tag = iframe_content.find('div', class_='gist-meta')
+            if tag is not None:
+                gist_raw_link = tag.find('a', href=re.compile(r'gist.github.com(.*)/raw/'))
+                if gist_raw_link is not None:
+                    # print(gist_raw_link['href'])`
+                    req = requests.get(gist_raw_link['href'])
+                    if req.status_code == 200:
+                        code_html = BeautifulSoup(req.content, HTML_PARSER)
+                        return '\n```\n{}\n```\n\n'.format(code_html.prettify())
+        except RuntimeError:
+            print("[ERROR] Failed to parse the embed link.")
+            # print(e)
+
+    elif medium_tag.name == 'a':
+        if medium_tag.has_attr('class') and 'markup--mixtapeEmbed-anchor' in medium_tag['class']:
+            link_text_tag = medium_tag.strong
+            if link_text_tag is not None:
+                text = strip_space(link_text_tag.text)
+            url = medium_tag.get('href')
+            if 'https://medium.com/r/?url=' in url:
+                url = url.split('url=')[1]
+                url = parse.unquote(url)
+            return '\n[{}]({})\n'.format(text, url)
+    else:
+        return None

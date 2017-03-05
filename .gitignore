@@ -137,3 +137,4 @@ output/
 .DS_Store
 README
 .vscode/
+config

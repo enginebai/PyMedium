@@ -97,7 +97,7 @@ def to_markdown(medium_tag):
     elif medium_tag.name == 'h4':
         return '\n### {}'.format(text)
     elif medium_tag.name == 'p':  # text paragraph
-        ## find style, link inside a paragraph
+        # find style, link inside a paragraph
         plain_text = ''
         for child in medium_tag.children:
             if child.name is None:
