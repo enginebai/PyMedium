@@ -56,6 +56,9 @@ def parse_user(payload):
     user.facebook = facebook_id
     user.following_count = following_count
     user.followedby_count = followby_count
+
+    if "paging" in payload["payload"]:
+        print(payload["payload"]["paging"])
     return user.__dict__
 
 
@@ -64,7 +67,6 @@ def parse_post(payload):
 
 
 def parse_post_detail(payload, post_detail_keys):
-    print(payload)
     if post_detail_keys is None:
         return
     post_list_payload = payload
@@ -126,7 +128,6 @@ def parse_post_detail(payload, post_detail_keys):
 
     post_list = []
     # payload -> references -> Post
-    print(post_list_payload)
     if type(post_list_payload) is dict:
         for post_id in post_list_payload.keys():
             post_dict = post_list_payload.get(post_id)
@@ -135,6 +136,9 @@ def parse_post_detail(payload, post_detail_keys):
     elif type(post_list_payload) is list:
         for post_dict in post_list_payload:
             post_list.append(parse_post_dict(post_dict))
+
+    if "paging" in payload["payload"]:
+        print(payload["payload"]["paging"])
     return post_list
 
 

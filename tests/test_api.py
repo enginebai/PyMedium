@@ -17,6 +17,8 @@ class ApiTestCase(unittest.TestCase):
         self.user_req = requests.get(ROOT + "enginebai")
         print("Request user posts...")
         self.user_post_req = requests.get(ROOT + "enginebai/posts")
+        print("Request one user post...")
+        self.user_one_post_req = requests.get(ROOT + "enginebai/posts?n=1")
         print("Request tag top posts...")
         self.tag_top_req = requests.get(ROOT + "tags/android")
         print("Request tag latest posts...")
@@ -26,6 +28,7 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(self.top_req.status_code, 200)
         self.assertEqual(self.user_req.status_code, 200)
         self.assertEqual(self.user_post_req.status_code, 200)
+        self.assertEqual(self.user_one_post_req.status_code, 200)
         self.assertEqual(self.tag_top_req.status_code, 200)
         self.assertEqual(self.tag_latest_req.status_code, 200)
 

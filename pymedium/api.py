@@ -3,13 +3,14 @@
 
 import json
 
-from flask import Flask, jsonify, Response
+from flask import Flask, jsonify, Response, request
 import requests
 from .parser import parse_user, parse_post
 
 ROOT_URL = "https://medium.com/"
 ESCAPE_CHARACTERS = "])}while(1);</x>"
 ACCEPT_HEADER = {"Accept": "application/json"}
+COUNT = 10
 
 app = Flask(__name__)
 
@@ -26,7 +27,8 @@ def get_user_profile(username):
 
 @app.route("/<username>/posts", methods=["GET"])
 def get_user_posts(username):
-    return process_post_request(ROOT_URL + "@{0}/latest".format(username))
+    count = request.args.get("n", COUNT)
+    return process_post_request(ROOT_URL + "@{0}/latest?limit={count}".format(username, count=count))
 
 
 @app.route("/top")
@@ -36,12 +38,14 @@ def get_top_posts():
 
 @app.route("/tags/<tag_name>", methods=["GET"])
 def get_top_posts_by_tag(tag_name):
-    return process_post_request(ROOT_URL + "tag/{tag}".format(tag=tag_name))
+    count = request.args.get("n", COUNT)
+    return process_post_request(ROOT_URL + "tag/{tag}?limit={count}".format(tag=tag_name, count=count))
 
 
 @app.route("/tags/<tag_name>/latest", methods=["GET"])
 def get_latest_posts_by_tag(tag_name):
-    return process_post_request(ROOT_URL + "tag/{tag}/latest".format(tag=tag_name))
+    count = request.args.get("n", COUNT)
+    return process_post_request(ROOT_URL + "tag/{tag}/latest?limit={count}".format(tag=tag_name, count=count))
 
 
 def send_request(url, headers=ACCEPT_HEADER, param=None, parse_function=None):
