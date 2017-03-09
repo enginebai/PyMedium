@@ -11,91 +11,91 @@ class User:
 
     @property
     def username(self):
-        return self.username
+        return self._username
 
     @username.setter
     def username(self, username):
-        self.username = username
+        self._username = username
 
     @property
     def display_name(self):
-        return self.display_name
+        return self._display_name
 
     @display_name.setter
     def display_name(self, name):
-        self.display_name = name
+        self._display_name = name
 
     @property
     def avatar(self):
-        return self.avatar
+        return self._avatar
 
     @avatar.setter
     def avatar(self, avatar):
-        self.avatar = avatar
+        self._avatar = avatar
 
     @property
     def bio(self):
-        return self.bio()
+        return self._bio()
 
     @bio.setter
     def bio(self, bio):
-        self.bio = bio
+        self._bio = bio
 
     @property
     def twitter(self):
-        return self.twitter
+        return self._twitter
 
     @twitter.setter
     def twitter(self, twitter):
-        self.twitter = twitter
+        self._twitter = twitter
 
     @property
     def facebook(self):
-        return self.facebook
+        return self._facebook
 
     @facebook.setter
     def facebook(self, facebook):
-        self.facebook = facebook
+        self._facebook = facebook
 
     @property
     def publications(self):
-        return self.publications
+        return self._publications
 
     @publications.setter
     def publications(self, publications):
-        self.publications = publications
+        self._publications = publications
 
     @property
     def following_count(self):
-        return self.following_count
+        return self._following_count
 
     @following_count.setter
     def following_count(self, count):
-        self.following_count = count
+        self._following_count = count
 
     @property
     def followedby_count(self):
-        return self.followedby_count
+        return self._followedby_count
 
     @followedby_count.setter
     def followedby_count(self, count):
-        self.followedby_count = count
+        self._followedby_count = count
 
     @property
     def interest_tags(self):
-        return self.interest_tags
+        return self._interest_tags
 
     @interest_tags.setter
     def interest_tags(self, tags):
-        self.interest_tags = tags
+        self._interest_tags = tags
 
     @property
     def author_tags(self):
-        return self.author_tags
+        return self._author_tags
 
     @author_tags.setter
     def author_tags(self, tags):
-        self.author_tags = tags
+        self._author_tags = tags
 
 
 class Post:
@@ -104,91 +104,91 @@ class Post:
 
     @property
     def unique_slug(self):
-        return self.unique_slug
+        return self._unique_slug
 
     @unique_slug.setter
     def unique_slug(self, slug):
-        self.unique_slug = slug
+        self._unique_slug = slug
 
     @property
     def title(self):
-        return self.title
+        return self._title
 
     @title.setter
     def title(self, title):
-        self.title = title
+        self._title = title
 
     @property
     def post_date(self):
-        return self.post_date
+        return self._post_date
 
     @post_date.setter
     def post_date(self, date):
-        self.post_date = date
+        self._post_date = date
 
     @property
     def url(self):
-        return self.url
+        return self._url
 
     @url.setter
     def url(self, url):
-        self.url = url
+        self._url = url
 
     @property
     def recommend_count(self):
-        return self.recommend_count
+        return self._recommend_count
 
     @recommend_count.setter
     def recommend_count(self, count):
-        self.recommend_count = count
+        self._recommend_count = count
 
     @property
     def response_count(self):
-        return self.response_count
+        return self._response_count
 
     @response_count.setter
     def response_count(self, count):
-        self.response_count = count
+        self._response_count = count
 
     @property
     def read_time(self):
-        return self.read_time
+        return self._read_time
 
     @read_time.setter
     def read_time(self, time):
-        self.read_time = time
+        self._read_time = time
 
     @property
     def word_count(self):
-        return self.word_count
+        return self._word_count
 
     @word_count.setter
     def word_count(self, count):
-        self.word_count = count
+        self._word_count = count
 
     @property
     def image_count(self):
-        return self.image_count
+        return self._image_count
 
     @image_count.setter
     def image_count(self, count):
-        self.image_count = count
+        self._image_count = count
 
     @property
     def preview_image(self):
-        return self.preview_image
+        return self._preview_image
 
     @preview_image.setter
     def preview_image(self, image):
-        self.preview_image = image
+        self._preview_image = image
 
     @property
     def post_tags(self):
-        return self.post_tags
+        return self._post_tags
 
     @post_tags.setter
     def post_tags(self, tags):
-        self.post_tags = tags
+        self._post_tags = tags
 
 
 class Publication:
@@ -197,101 +197,101 @@ class Publication:
 
     @property
     def name(self):
-        return self.name
+        return self._name
 
     @name.setter
     def name(self, name):
-        self.name = name
+        self._name = name
 
     @property
     def unique_slug(self):
-        return self.unique_slug
+        return self._unique_slug
 
     @unique_slug.setter
     def unique_slug(self, slug):
-        self.unique_slug = slug
+        self._unique_slug = slug
 
     @property
     def creator_user_id(self):
-        return self.creator_user_id
+        return self._creator_user_id
 
     @creator_user_id.setter
     def creator_user_id(self, user_id):
-        self.creator_user_id = user_id
+        self._creator_user_id = user_id
 
     @property
     def description(self):
-        return self.description
+        return self._description
 
     @description.setter
     def description(self, description):
-        self.description = description
+        self._description = description
 
     @property
     def image(self):
-        return self.image
+        return self._image
 
     @image.setter
     def image(self, image):
-        self.image = image
+        self._image = image
 
     @property
     def logo(self):
-        return self.logo
+        return self._logo
 
     @logo.setter
     def logo(self, logo):
-        self.logo = logo
+        self._logo = logo
 
     @property
     def follower_count(self):
-        return self.follower_count
+        return self._follower_count
 
     @follower_count.setter
     def follower_count(self, count):
-        self.follower_count = count
+        self._follower_count = count
 
 
 class Tag:
     @property
     def unique_slug(self):
-        return self.unique_slug
+        return self._unique_slug
 
     @unique_slug.setter
     def unique_slug(self, slug):
-        self.unique_slug = slug
+        self._unique_slug = slug
 
     @property
     def name(self):
-        return self.name
+        return self._name
 
     @name.setter
     def name(self, name):
-        self.name = name
+        self._name = name
 
     @property
     def post_count(self):
-        return self.post_count
+        return self._post_count
 
     @post_count.setter
     def post_count(self, count):
-        self.post_count = count
+        self._post_count = count
 
     @property
     def follower_count(self):
-        return self.follower_count
+        return self._follower_count
 
     @follower_count.setter
     def follower_count(self, count):
-        self.follower_count = count
+        self._follower_count = count
 
     @property
     def image(self):
-        return self.image
+        return self._image
 
     @image.setter
     def image(self, image):
-        self.image = image
+        self._image = image
 
 
 class Image:
@@ -300,27 +300,27 @@ class Image:
 
     @property
     def original_height(self):
-        return self.original_height
+        return self._original_height
 
     @original_height.setter
     def original_height(self, height):
-        self.original_height = height
+        self._original_height = height
 
     @property
     def original_width(self):
-        return self.original_width
+        return self._original_width
 
     @original_width.setter
     def original_width(self, width):
-        self.original_width = width
+        self._original_width = width
 
     @property
     def url(self):
-        return self.url
+        return self._url
 
     @url.setter
     def url(self, url):
-        self.url = url
+        self._url = url
 
 
 class OutputFormat(Enum):
@@ -328,3 +328,9 @@ class OutputFormat(Enum):
     JSON = "json"
     HTML = "html"
     MARKDOWN = "md"
+
+
+def to_dict(model):
+    return dict((key.replace("_", "", 1), value)
+                for key, value in model.__dict__.items()
+                if not callable(value) and not key.startswith("__"))

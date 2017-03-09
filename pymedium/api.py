@@ -34,7 +34,8 @@ def get_user_posts(username):
 
 @app.route("/top")
 def get_top_posts():
-    return process_post_request(ROOT_URL + "browse/top")
+    count = request.args.get("n", COUNT)
+    return process_post_request(ROOT_URL + "browse/top?limit={count}".format(count=count))
 
 
 @app.route("/tags/<tag_name>", methods=["GET"])

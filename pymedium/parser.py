@@ -1,9 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
-import json
-import os
 import re
-import sys
 from urllib.parse import unquote
 
 import requests
@@ -11,7 +8,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-from .model import User, Post, Publication, Tag, Image, OutputFormat
+from .model import User, Post, Publication, Tag, Image, OutputFormat, to_dict
 
 __author__ = 'enginebai'
 
@@ -52,7 +49,7 @@ def parse_user(payload):
             logo_dict = publication_dict["logo"]
             publication.logo = parse_images(logo_dict)
             publication.follower_count = publication_dict["metadata"]["followerCount"]
-            publication_list.append(publication.__dict__)
+            publication_list.append(to_dict(publication))
         user.publications = publication_list
 
     stats_dict = ref_dict["SocialStats"][user_id]
@@ -69,9 +66,7 @@ def parse_user(payload):
     user.following_count = following_count
     user.followedby_count = followby_count
 
-    if "paging" in payload["payload"]:
-        print(payload["payload"]["paging"])
-    return user.__dict__
+    return to_dict(user)
 
 
 def parse_post(payload):
@@ -135,7 +130,7 @@ def parse_post_information(payload, post_detail_keys):
         # print("{id}, {title}".format(id=post_id, title=title))
         # print("{recommend}, {response}, {read}".format(
         # recommend=recommend_count, response=response_count, read=read_time))
-        return post.__dict__
+        return to_dict(post)
 
     post_list = []
     # payload -> references -> Post
@@ -148,8 +143,6 @@ def parse_post_information(payload, post_detail_keys):
         for post_dict in post_list_payload:
             post_list.append(parse_post_dict(post_dict))
 
-    if "paging" in payload["payload"]:
-        print(payload["payload"]["paging"])
     return post_list
 
 
@@ -164,7 +157,7 @@ def parse_tags(tags_list_dict):
             metadata_dict = tag_dict["metadata"]
             if metadata_dict is not None:
                 tag.follower_count = metadata_dict["followerCount"]
-            tags_list.append(tag.__dict__)
+            tags_list.append(to_dict(tag))
         return tags_list
 
 
@@ -177,7 +170,7 @@ def parse_images(image_dict):
             .format(width=image.original_width,
                     height=image.original_height,
                     id=image.image_id)
-        return image.__dict__
+        return to_dict(image)
 
 
 def parse_post_detail(post_url, output_format):
