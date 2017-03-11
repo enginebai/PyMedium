@@ -174,15 +174,23 @@ def parse_images(image_dict):
 
 
 def parse_post_detail(post_url, output_format):
-    with webdriver.Remote(desired_capabilities=DesiredCapabilities.HTMLUNITWITHJS) as driver:
+    driver = webdriver.Chrome("driver/chromedriver")
+    # driver = webdriver.Remote(desired_capabilities=DesiredCapabilities.CHROME)
+    try:
         driver.get(post_url)
         content_elements = driver.find_element_by_class_name("postArticle-content")
         content_tags = BeautifulSoup(content_elements.get_attribute("innerHTML"), HTML_PARSER).find_all()
 
+        response = ""
         if output_format == OutputFormat.MARKDOWN.value:
-            return to_markdown(content_tags, driver)
-        else:
-            return ""
+            for i in range(0, len(content_tags)):
+                tag = content_tags[i]
+                md = to_markdown(tag, driver)
+                if md is not None and md:
+                    response += md + "\n"
+        return response
+    finally:
+        driver.close()
 
 
 def strip_space(text, trim_space=True):
@@ -250,24 +258,26 @@ def to_markdown(medium_tag, driver):
         return '\n```\n{}```\n\n'.format(code_block)
     elif medium_tag.name == 'hr':
         return '\n----\n'
-    elif medium_tag.name == 'iframe':
-        # gist, video, github, link...etc.
-        iframe_url = ROOT_URL + medium_tag['data-src']
-        try:
-            driver.get(iframe_url)
-            iframe_content = BeautifulSoup(driver.page_source, HTML_PARSER)
-            tag = iframe_content.find('div', class_='gist-meta')
-            if tag is not None:
-                gist_raw_link = tag.find('a', href=re.compile(r'gist.github.com(.*)/raw/'))
-                if gist_raw_link is not None:
-                    # print(gist_raw_link['href'])`
-                    req = requests.get(gist_raw_link['href'])
-                    if req.status_code == 200:
-                        code_html = BeautifulSoup(req.content, HTML_PARSER)
-                        return '\n```\n{}\n```\n\n'.format(code_html.prettify())
-        except RuntimeError:
-            print("[ERROR] Failed to parse the embed link.")
-            # print(e)
+
+    # TODO: need more test and change to adopt to chrome driver
+    # elif medium_tag.name == 'iframe':
+    #     # gist, video, github, link...etc.
+    #     iframe_url = ROOT_URL + medium_tag['data-src']
+    #     try:
+    #         driver.get(iframe_url)
+    #         iframe_content = BeautifulSoup(driver.page_source, HTML_PARSER)
+    #         tag = iframe_content.find('div', class_='gist-meta')
+    #         if tag is not None:
+    #             gist_raw_link = tag.find('a', href=re.compile(r'gist.github.com(.*)/raw/'))
+    #             if gist_raw_link is not None:
+    #                 # print(gist_raw_link['href'])`
+    #                 req = requests.get(gist_raw_link['href'])
+    #                 if req.status_code == 200:
+    #                     code_html = BeautifulSoup(req.content, HTML_PARSER)
+    #                     return '\n```\n{}\n```\n\n'.format(code_html.prettify())
+    #     except RuntimeError:
+    #         print("[ERROR] Failed to parse the embed link.")
+    #         # print(e)
 
     elif medium_tag.name == 'a':
         if medium_tag.has_attr('class') and 'markup--mixtapeEmbed-anchor' in medium_tag['class']:

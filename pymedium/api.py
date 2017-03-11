@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
-
+import http
 import json
 
 import requests
@@ -68,9 +68,10 @@ def process_post_request(url):
 
 @app.route("/post", methods=["GET"])
 def get_post():
-    url = request.args.get("url", "")
+    url = request.args.get("u", "")
+    print(url)
     output_format = request.args.get("format", OutputFormat.PLAIN_TEXT.value)
     if url:
         return parse_post_detail(url, output_format)
     else:
-        return url
+        return Response(status=400)
