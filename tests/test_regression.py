@@ -78,8 +78,8 @@ def regression_test():
              "waymo", "quincylarson", "benjaminhardy", "jsaito", "lindacaroll", "jasonfried")
     for u in users:
         test_user_api(u)
-        ok, fail = test_posts_from_user_interest_tags(u)
-        ok1, fail1 = test_post_api(u)
+        # ok, fail = test_posts_from_user_interest_tags(u)
+        ok, fail = test_post_api(u)
         if fail > 0:
             raise Exception(u)
         print(ok, fail)

@@ -174,23 +174,35 @@ def parse_images(image_dict):
 
 
 def parse_post_detail(post_url, output_format):
-    driver = webdriver.Chrome("driver/chromedriver")
     # driver = webdriver.Remote(desired_capabilities=DesiredCapabilities.CHROME)
-    try:
-        driver.get(post_url)
-        content_elements = driver.find_element_by_class_name("postArticle-content")
-        content_tags = BeautifulSoup(content_elements.get_attribute("innerHTML"), HTML_PARSER).find_all()
+    if output_format == OutputFormat.JSON.value:
+        post_detail_json_req = requests.get(post_url, headers={"Accept": "application/json"})
+        if post_detail_json_req.status_code == requests.codes.ok:
+            return post_detail_json_req.text
+        else:
+            return None
+    else:
+        driver = webdriver.Chrome("driver/chromedriver")
+        try:
+            driver.get(post_url)
+            content_elements = driver.find_element_by_class_name("postArticle-content")
+            inner_html = BeautifulSoup(content_elements.get_attribute("innerHTML"), HTML_PARSER)
+            content_tags = inner_html.find_all()
 
-        response = ""
-        if output_format == OutputFormat.MARKDOWN.value:
-            for i in range(0, len(content_tags)):
-                tag = content_tags[i]
-                md = to_markdown(tag, driver)
-                if md is not None and md:
-                    response += md + "\n"
-        return response
-    finally:
-        driver.close()
+            response = ""
+            if output_format == OutputFormat.MARKDOWN.value:
+                for i in range(0, len(content_tags)):
+                    tag = content_tags[i]
+                    md = to_markdown(tag, driver)
+                    if md is not None and md:
+                        response += md + "\n"
+            elif output_format == OutputFormat.HTML.value:
+                response = inner_html.prettify(formatter=None)
+            elif output_format == OutputFormat.PLAIN_TEXT.value:
+                response = inner_html.get_text()
+            return response
+        finally:
+            driver.close()
 
 
 def strip_space(text, trim_space=True):

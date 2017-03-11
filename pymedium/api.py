@@ -71,7 +71,20 @@ def get_post():
     url = request.args.get("u", "")
     print(url)
     output_format = request.args.get("format", OutputFormat.PLAIN_TEXT.value)
+    if not output_format:
+        output_format = OutputFormat.PLAIN_TEXT.value
     if url:
-        return parse_post_detail(url, output_format)
+        detail_str = parse_post_detail(url, output_format)
+        status_code = 200
+        mime_type = "text/html"
+        if output_format == OutputFormat.JSON.value:
+            if detail_str is None:
+                status_code = 404
+            else:
+                detail_str = detail_str.replace(ESCAPE_CHARACTERS, "")
+            mime_type = "application/json"
+        return Response(response=detail_str,
+                        status=status_code,
+                        mimetype=mime_type)
     else:
         return Response(status=400)

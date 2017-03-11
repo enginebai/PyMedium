@@ -23,6 +23,9 @@ class ApiTestCase(unittest.TestCase):
         self.tag_top_req = requests.get(ROOT + "tags/android")
         print("Request tag latest posts...")
         self.tag_latest_req = requests.get(ROOT + "tags/android/latest")
+        print("Request post detail...")
+        self.post_detail_req = requests.get(ROOT + "post?u={url}".format(
+            url="https://medium.com/dualcores-studio/python-x-%E7%B6%B2%E8%B7%AF%E7%88%AC%E8%9F%B2-c30ffda0ad78"))
 
     def test_apis_ok(self):
         self.assertEqual(self.top_req.status_code, 200)
@@ -31,6 +34,7 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(self.user_one_post_req.status_code, 200)
         self.assertEqual(self.tag_top_req.status_code, 200)
         self.assertEqual(self.tag_latest_req.status_code, 200)
+        self.assertEqual(self.post_detail_req.status_code, 200)
 
 
 class ApiResponseCase(unittest.TestCase):
