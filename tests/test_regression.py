@@ -71,18 +71,33 @@ def test_posts_from_user_interest_tags(username):
     return ok, fail
 
 
+def test_post_detail_api(username):
+    url = ROOT + "{username}/posts".format(username=username)
+    print("Test post detail API from " + url)
+    req = requests.get(url)
+    if req.status_code == requests.codes.ok:
+        post_list = json.loads(req.text)
+        for post_dict in post_list:
+            print("Get post detail from " + post_dict["title"], post_dict["url"])
+            post_req = requests.get(ROOT + "post?u={url}".format(url=post_dict["url"]))
+            if post_req.status_code != requests.codes.ok:
+                raise Exception(post_dict["url"], post_req.status_code)
+
+
 def regression_test():
     ok, fail = test_post_api()
     print(ok, fail)
     users = ("sitapati", "enginebai", "101", "mobiscroll", "richard.yang.uw", "tzhongg", "jon.moore", "JonDeng",
              "waymo", "quincylarson", "benjaminhardy", "jsaito", "lindacaroll", "jasonfried")
     for u in users:
-        test_user_api(u)
+        test_post_detail_api(u)
+        # test_user_api(u)
         # ok, fail = test_posts_from_user_interest_tags(u)
-        ok, fail = test_post_api(u)
-        if fail > 0:
-            raise Exception(u)
-        print(ok, fail)
+        # ok, fail = test_post_api(u)
+        # if fail > 0:
+        #     raise Exception(u)
+        # print(ok, fail)
+
 
 
 if __name__ == "__main__":
