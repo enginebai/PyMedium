@@ -16,11 +16,6 @@ COUNT = 10
 app = Flask(__name__)
 
 
-@app.route("/")
-def index():
-    return "Hello!!"
-
-
 @app.route("/<username>", methods=["GET"])
 def get_user_profile(username):
     return send_request(ROOT_URL + "@{0}/latest".format(username), parse_function=parse_user)

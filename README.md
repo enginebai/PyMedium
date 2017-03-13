@@ -1,79 +1,117 @@
-# M2M - the Medium & Markdown conversion tool
+# PyMedium - Unofficial Medium API
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-![](https://raw.githubusercontent.com/enginebai/m2m/master/art/graphic.png)
-
-The `m2m` is a tool to help you convert medium article into markdown format file. It can be used to backup your medium articles or just synchronize your medium to other several blog platforms.
-
-**Why** is `m2m`? For those people who have several blog platforms, it's a real pain :weary: to write your same article again and again or copy/paste and change the format separately to different platforms. The `m2m` is here to solve this problem, once you complete your new medium article, you just use it to export to markdown and import your article to those platforms. 
-
+*PyMedium* is an unofficial Medium API. It provides developers to access to user, post list and detail information from [Medium](
+https://medium.com/) website. This is a read-only API to Medium, you can customize this API to fit your requirements and deploy on your own server.
 
 ## Installation
+Before running PyMedium API, you have to clone the code, install requirements at first.
 
 ```shell
-$ pip install m2m
+$ git clone git@github.com:enginebai/PyMedium.git
+$ cd PyMedium
+$ pip install -r requirements.txt
 ```
 
-## Setup
-> Download selenium driver and start it.
+Then download web driver to `driver` folder from [Selenium](http://selenium-python.readthedocs.io/) or via the command-line with `curl` (update `{VERSION}` with the latest version code and `{OS` with your server operating system.
+
+```shell
+$ mkdir driver | cd driver
+$ curl -O https://chromedriver.storage.googleapis.com/{VERSION}/chromedriver_{OS}.zip
+$ unzip chromedriver_{OS}.zip
+```
 
 ## Usage
-### Medium CLI Tool:
+Just like flask
 
-* You can convert from medium to markdown file by default:
+## Documentation
 
-```shell
-$ m2m http://medium.com/enginebai/blog1 ./output/blog1.md
+### User
+`GET /enginebai`
+
+```json
+{
+  "avatar": "1*Y7zH0UM975YmchIO86uIGA.jpeg",
+  "bio": "Mixtape of developer, designer and startup. Cofounder and developer of DualCores Studio. Follow my technical blog: http://enginebai.logdown.com/",
+  "display_name": "Engine Bai",
+  "facebook": "789985027713671",
+  "followedby_count": 442,
+  "following_count": 238,
+  "publications": [
+    {
+      "description": "Stories from the mix of designer and developer. 設計與工程的交織，混搭激盪出不同的想像。",
+      "follower_count": 300,
+      "image": {
+        "imageid": "1*DLixNgsMpK5B74na3EDucQ.png",
+        "original_height": 591,
+        "original_width": 591,
+        "url": "https://cdn-images-1.medium.com/fit/t/591/591/1*DLixNgsMpK5B74na3EDucQ.png"
+      },
+      "logo": {
+        "imageid": "1*DLixNgsMpK5B74na3EDucQ.png",
+        "original_height": 591,
+        "original_width": 591,
+        "url": "https://cdn-images-1.medium.com/fit/t/591/591/1*DLixNgsMpK5B74na3EDucQ.png"
+      },
+      "name": "DualCores Studio",
+      "publicationid": "275e26e7c1b2",
+      "unique_slug": "dualcores-studio"
+    }
+  ],
+  "twitter": "enginebai",
+  "userid": "3301d32a6bba",
+  "username": "enginebai"
+}
 ```
 
-* Or export to markdown file with default article title:
+#### Post
+* `GET /enginebai/posts`
+* `GET /top`
+* `GET /tag/android`
 
-```shell
-$ m2m http://medium.com/enginebai/blog1
+```json
+[
+  {
+    "image_count": 14,
+    "post_date": 1478533474858,
+    "postid": "99a3d86df228",
+    "preview_image": {
+      "imageid": "1*zhnQJhNzp-Oal1-GU1EUKw.png",
+      "original_height": 412,
+      "original_width": 608,
+      "url": "https://cdn-images-1.medium.com/fit/t/608/412/1*zhnQJhNzp-Oal1-GU1EUKw.png"
+    },
+    "read_time": 7.74811320754717,
+    "recommend_count": 348,
+    "response_count": 10,
+    "title": "Make an android custom view, publish and open source.",
+    "unique_slug": "make-an-android-custom-view-publish-and-open-source-99a3d86df228",
+    "url": "https://medium.com/dualcores-studio/make-an-android-custom-view-publish-and-open-source-99a3d86df228",
+    "word_count": 1669
+  }
+]
 ```
 
-#### Medium GET API:
+`GET /post`
 
-* Now you can get 
+```
+## Simple text, json, html, markdown format
+```
 
-## Supported medium format
-The most common format of text on medium is supported by `m2m`, however, medium provides rich embed content more than `m2m` can support, just make sure your **embed contents** are not missing after conversion yet or you can append the link manually.
 
-The following is supported format:
+## Issues
+Feel free to submit bug reports or feature requests.
 
-* Plain text.
-* Header1, header2.
-* Bold, italic.
-* Link, embed link.
-* Quote.
-* Separator.
-* Ordered and bulleted list.
-* Image 
-* Inline code, code block, gist.
 
-> The full list you can check on [wiki](https://github.com/enginebai/m2m/wiki/Medium-supported-format-demo) page. 
+## Contributing
 
-## License
+> TODO: copy from requests `How to Contribute` section.
 
-        The MIT License (MIT)
+[Read more on contributing](./CONTRIBUTING.md).
 
-        Copyright © 2016 Engine Bai.
+License
+-------
 
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in
-        all copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-        THE SOFTWARE.
+Copyright (c) 2017 Engine Bai
+Licensed under the [MIT license](http://opensource.org/licenses/MIT).

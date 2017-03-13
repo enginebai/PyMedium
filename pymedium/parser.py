@@ -175,6 +175,7 @@ def parse_images(image_dict):
 
 def parse_post_detail(post_url, output_format):
     # driver = webdriver.Remote(desired_capabilities=DesiredCapabilities.CHROME)
+    # for json format, just return medium json response
     if output_format == OutputFormat.JSON.value:
         post_detail_json_req = requests.get(post_url, headers={"Accept": "application/json"})
         if post_detail_json_req.status_code == requests.codes.ok:
@@ -182,6 +183,7 @@ def parse_post_detail(post_url, output_format):
         else:
             return None
     else:
+        # for else formats, use Selenium to render page to get actual content and parse it
         driver = webdriver.Chrome("driver/chromedriver")
         try:
             driver.get(post_url)
