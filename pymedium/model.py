@@ -331,6 +331,9 @@ class OutputFormat(Enum):
 
 
 def to_dict(model):
-    return dict((key.replace("_", "", 1), value)
+    return dict((get_key(key), value)
                 for key, value in model.__dict__.items()
                 if not callable(value) and not key.startswith("__"))
+
+def get_key(key):
+    return key.replace("_", "", 1) if key.startswith("_") else key
