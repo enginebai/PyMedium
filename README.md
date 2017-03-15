@@ -84,7 +84,7 @@ $ flask run
 #### Parameters
 |Name   |Type   |Description   |
 |---|---|---|
-|n   |integer   |The count of posts to return.   |
+|n   |integer   |The count of posts to return. Default is 10.   |
 
 #### Response
 ```json
@@ -107,9 +107,11 @@ $ flask run
     "url": "https://medium.com/dualcores-studio/make-an-android-custom-view-publish-and-open-source-99a3d86df228",
     "word_count": 1669
   }
-]```
+]
+```
 
 ### Post detail
+
 `GET /post`
 
 #### Parameters
@@ -119,6 +121,7 @@ $ flask run
 |format   |string   |(optional) The format of response, the value could be `text`, `html`, `md`, `json`, default is `text`.   |
 
 #### Response
+
 ```
 ## Simple text, json, html, markdown format
 ```
