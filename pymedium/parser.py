@@ -6,7 +6,6 @@ from urllib.parse import unquote
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from .model import User, Post, Publication, Tag, Image, OutputFormat, to_dict
 
@@ -41,16 +40,21 @@ def parse_user(payload):
         for pub_id in publication_ids:
             publication_dict = ref_dict["Collection"][pub_id]
             publication = Publication(pub_id)
-            publication.name = publication_dict["name"]
-            publication.unique_slug = publication_dict["slug"]
+            publication.display_name = publication_dict["name"]
+            publication.name = publication_dict["slug"]
             publication.description = publication_dict["description"]
             image_dict = publication_dict["image"]
-            publication.image = parse_images(image_dict)
+            image = parse_images(image_dict)
+            if image is not None:
+                publication.image = image
             logo_dict = publication_dict["logo"]
-            publication.logo = parse_images(logo_dict)
+            logo = parse_images(logo_dict)
+            if logo is not None:
+                publication.logo = logo
             publication.follower_count = publication_dict["metadata"]["followerCount"]
             publication_list.append(to_dict(publication))
-        user.publications = publication_list
+        if len(publication_list) > 0:
+            user.publications = publication_list
 
     stats_dict = ref_dict["SocialStats"][user_id]
     following_count = stats_dict["usersFollowedCount"]
@@ -116,7 +120,7 @@ def parse_post_information(payload, post_detail_keys):
         # post_tags = virtual_dict["tags"]
         # post.post_tags = parse_tags(post_tags)
 
-        post.unique_slug = unique_slug
+        # post.unique_slug = unique_slug
         post.title = title
         post.post_date = post_date
         post.url = url
@@ -125,7 +129,9 @@ def parse_post_information(payload, post_detail_keys):
         post.read_time = read_time
         post.word_count = word_count
         post.image_count = image_count
-        post.preview_image = parse_images(preview_image)
+        image = parse_images(preview_image)
+        if image is not None:
+            post.preview_image = image
 
         # print("{id}, {title}".format(id=post_id, title=title))
         # print("{recommend}, {response}, {read}".format(
@@ -163,17 +169,22 @@ def parse_tags(tags_list_dict):
 
 def parse_images(image_dict):
     if image_dict is not None:
-        image = Image(image_dict["imageId"] if "imageId" in image_dict else image_dict["id"])
-        image.original_width = image_dict["originalWidth"]
-        image.original_height = image_dict["originalHeight"]
-        image.url = u"https://cdn-images-1.medium.com/fit/t/{width}/{height}/{id}" \
-            .format(width=image.original_width,
-                    height=image.original_height,
-                    id=image.image_id)
-        return to_dict(image)
+        image_id = image_dict["imageId"] if "imageId" in image_dict else image_dict["id"]
+        if image_id:
+            image = Image(image_id)
+            image.original_width = image_dict["originalWidth"]
+            image.original_height = image_dict["originalHeight"]
+            # This isn't working.
+            # image.url = u"https://cdn-images-1.medium.com/fit/t/{width}/{height}/{id}" \
+            #     .format(width=image.original_width,
+            #             height=image.original_height,
+            #             id=image.image_id)
+            return to_dict(image)
+        else:
+            return None
 
 
-def parse_post_detail(post_url, output_format):
+def parse_post_detail(post_url, output_format, driver):
     # driver = webdriver.Remote(desired_capabilities=DesiredCapabilities.CHROME)
     # for json format, just return medium json response
     if output_format == OutputFormat.JSON.value:
@@ -184,27 +195,23 @@ def parse_post_detail(post_url, output_format):
             return None
     else:
         # for else formats, use Selenium to render page to get actual content and parse it
-        driver = webdriver.Chrome("driver/chromedriver")
-        try:
-            driver.get(post_url)
-            content_elements = driver.find_element_by_class_name("postArticle-content")
-            inner_html = BeautifulSoup(content_elements.get_attribute("innerHTML"), HTML_PARSER)
-            content_tags = inner_html.find_all()
+        driver.get(post_url)
+        content_elements = driver.find_element_by_class_name("postArticle-content")
+        inner_html = BeautifulSoup(content_elements.get_attribute("innerHTML"), HTML_PARSER)
+        content_tags = inner_html.find_all()
 
-            response = ""
-            if output_format == OutputFormat.MARKDOWN.value:
-                for i in range(0, len(content_tags)):
-                    tag = content_tags[i]
-                    md = to_markdown(tag, driver)
-                    if md is not None and md:
-                        response += md + "\n"
-            elif output_format == OutputFormat.HTML.value:
-                response = inner_html.prettify(formatter=None)
-            elif output_format == OutputFormat.PLAIN_TEXT.value:
-                response = inner_html.get_text()
-            return response
-        finally:
-            driver.close()
+        response = ""
+        if output_format == OutputFormat.MARKDOWN.value:
+            for i in range(0, len(content_tags)):
+                tag = content_tags[i]
+                md = to_markdown(tag, driver)
+                if md is not None and md:
+                    response += md + "\n"
+        elif output_format == OutputFormat.HTML.value:
+            response = inner_html.prettify(formatter=None)
+        elif output_format == OutputFormat.PLAIN_TEXT.value:
+            response = inner_html.get_text()
+        return response
 
 
 def strip_space(text, trim_space=True):

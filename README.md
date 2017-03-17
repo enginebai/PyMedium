@@ -51,23 +51,22 @@ $ flask run
   "publications": [
     {
       "description": "Stories from the mix of designer and developer. 設計與工程的交織，混搭激盪出不同的想像。",
+      "display_name": "DualCores Studio",
       "follower_count": 300,
       "image": {
         "image_id": "1*DLixNgsMpK5B74na3EDucQ.png",
         "original_height": 591,
-        "original_width": 591,
-        "url": "https://cdn-images-1.medium.com/fit/t/591/591/1*DLixNgsMpK5B74na3EDucQ.png"
+        "original_width": 591
       },
       "logo": {
         "image_id": "1*DLixNgsMpK5B74na3EDucQ.png",
         "original_height": 591,
-        "original_width": 591,
-        "url": "https://cdn-images-1.medium.com/fit/t/591/591/1*DLixNgsMpK5B74na3EDucQ.png"
+        "original_width": 591
       },
-      "name": "DualCores Studio",
-      "publication_id": "275e26e7c1b2",
-      "unique_slug": "dualcores-studio"
-    }
+      "name": "dualcores-studio",
+      "publication_id": "275e26e7c1b2"
+    },
+    ...more
   ],
   "twitter": "enginebai",
   "user_id": "3301d32a6bba",
@@ -96,17 +95,16 @@ $ flask run
     "preview_image": {
       "image_id": "1*zhnQJhNzp-Oal1-GU1EUKw.png",
       "original_height": 412,
-      "original_width": 608,
-      "url": "https://cdn-images-1.medium.com/fit/t/608/412/1*zhnQJhNzp-Oal1-GU1EUKw.png"
+      "original_width": 608
     },
     "read_time": 7.74811320754717,
     "recommend_count": 351,
     "response_count": 10,
     "title": "Make an android custom view, publish and open source.",
-    "unique_slug": "make-an-android-custom-view-publish-and-open-source-99a3d86df228",
     "url": "https://medium.com/dualcores-studio/make-an-android-custom-view-publish-and-open-source-99a3d86df228",
     "word_count": 1669
-  }
+  },
+  ...more
 ]
 ```
 

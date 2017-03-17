@@ -50,12 +50,12 @@ class User:
         self._twitter = twitter
 
     @property
-    def facebook(self):
-        return self._facebook
+    def facebook_user_id(self):
+        return self._facebook_user_id
 
-    @facebook.setter
-    def facebook(self, facebook):
-        self._facebook = facebook
+    @facebook_user_id.setter
+    def facebook_user_id(self, facebook):
+        self._facebook_user_id = facebook
 
     @property
     def publications(self):
@@ -102,13 +102,13 @@ class Post:
     def __init__(self, post_id):
         self.post_id = post_id
 
-    @property
-    def unique_slug(self):
-        return self._unique_slug
-
-    @unique_slug.setter
-    def unique_slug(self, slug):
-        self._unique_slug = slug
+    # @property
+    # def unique_slug(self):
+    #     return self._unique_slug
+    #
+    # @unique_slug.setter
+    # def unique_slug(self, slug):
+    #     self._unique_slug = slug
 
     @property
     def title(self):
@@ -196,20 +196,20 @@ class Publication:
         self.publication_id = publication_id
 
     @property
+    def display_name(self):
+        return self._display_name
+
+    @display_name.setter
+    def display_name(self, name):
+        self._display_name = name
+
+    @property
     def name(self):
         return self._name
 
     @name.setter
-    def name(self, name):
-        self._name = name
-
-    @property
-    def unique_slug(self):
-        return self._unique_slug
-
-    @unique_slug.setter
-    def unique_slug(self, slug):
-        self._unique_slug = slug
+    def name(self, slug):
+        self._name = slug
 
     @property
     def creator_user_id(self):
@@ -314,13 +314,13 @@ class Image:
     def original_width(self, width):
         self._original_width = width
 
-    @property
-    def url(self):
-        return self._url
-
-    @url.setter
-    def url(self, url):
-        self._url = url
+    # @property
+    # def url(self):
+    #     return self._url
+    #
+    # @url.setter
+    # def url(self, url):
+    #     self._url = url
 
 
 class OutputFormat(Enum):

@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
-import http
 import json
 
 import requests
 from flask import Flask, jsonify, Response, request
+from selenium import webdriver
 from pymedium.parser import parse_user, parse_post, parse_post_detail
 from pymedium.model import OutputFormat
 
@@ -14,6 +14,7 @@ ACCEPT_HEADER = {"Accept": "application/json"}
 COUNT = 10
 
 app = Flask(__name__)
+driver = webdriver.Chrome("driver/chromedriver")
 
 
 @app.route("/<username>", methods=["GET"])
@@ -69,7 +70,7 @@ def get_post():
     if not output_format:
         output_format = OutputFormat.PLAIN_TEXT.value
     if url:
-        detail_str = parse_post_detail(url, output_format)
+        detail_str = parse_post_detail(url, output_format, driver)
         status_code = 200
         mime_type = "text/html"
         if output_format == OutputFormat.JSON.value:
