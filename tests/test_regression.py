@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 import json
-
+import unittest
 import requests
 
 __author__ = 'enginebai'
@@ -9,13 +9,52 @@ __author__ = 'enginebai'
 ROOT = "http://localhost:5000/"
 
 
-def test_user_api(username):
-    url = ROOT + "{}".format(username)
-    req = requests.get(url)
-    if req.status_code == requests.codes.ok:
-        print(req.text)
-    else:
-        print(req.status_code)
+class RegressionTest(unittest.TestCase):
+    def setUp(self):
+        self.users = (
+        "sitapati", "enginebai", "101", "mobiscroll", "richard.yang.uw", "tzhongg", "jon.moore", "JonDeng",
+        "waymo", "quincylarson", "benjaminhardy", "jsaito", "lindacaroll", "jasonfried")
+
+    def test_user_api(self):
+        for user in self.users:
+            print("1. Requesting", user)
+            url = "{}{}".format(ROOT, user)
+            req = requests.get(url)
+            self.assertEqual(req.status_code, 200)
+
+    def test_post_api(self):
+        url = ROOT + "top"
+        print("2. Requesting", url)
+        req = requests.get(url)
+        self.assertEqual(req.status_code, 200)
+        response_list = json.loads(req.text)
+        for post in response_list:
+            print("2-1. Requesting", post["url"])
+            r = requests.get(post["url"])
+            self.assertEqual(r.status_code, 200)
+
+        for user in self.users:
+            url = "{}{}/posts".format(ROOT, user)
+            print("2-1. Requesting", url)
+            user_req = requests.get(url)
+            self.assertEqual(user_req.status_code, 200)
+            response_list = json.loads(user_req.text)
+            for post in response_list:
+                print("2-2. Requesting", post["url"])
+                r = requests.get(post["url"])
+                self.assertEqual(r.status_code, 200)
+
+    def test_post_detail(self):
+        for user in self.users:
+            print("3. Requesting ", user)
+            req = requests.get("{}{}/posts".format(ROOT, user))
+            self.assertEqual(req.status_code, 200)
+            post_list = json.loads(req.text)
+            for post in post_list:
+                url = "{}post?u={}".format(ROOT, post["url"])
+                print("3-1. Requesting", url)
+                r = requests.get(url)
+                self.assertEqual(r.status_code, 200)
 
 
 def test_post_api(username=None):
@@ -99,6 +138,6 @@ def regression_test():
         # print(ok, fail)
 
 
-
 if __name__ == "__main__":
-    regression_test()
+    # regression_test()
+    unittest.main()
