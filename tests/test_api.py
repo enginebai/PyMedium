@@ -40,7 +40,7 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(self.tag_latest_req.status_code, 200)
         self.assertEqual(self.post_detail_req.status_code, 200)
         self.assertEqual(self.publication_req.status_code, 200)
-        self.assertEqual(self.publication_req_custom_url, 200)
+        self.assertEqual(self.publication_req_custom_url.status_code, 200)
 
 
 class ApiResponseCase(unittest.TestCase):

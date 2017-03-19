@@ -17,19 +17,19 @@ app = Flask(__name__)
 driver = webdriver.Chrome("driver/chromedriver")
 
 
-@app.route("/<username>", methods=["GET"])
-def get_user_profile(username):
-    if username.startswith("@"):
+@app.route("/<name>", methods=["GET"])
+def get_user_or_publication_profile(name):
+    if name.startswith("@"):
         parse_function = parse_user
     else:
         parse_function = parse_publication
-    return send_request(ROOT_URL + "{0}/latest".format(username), parse_function=parse_function)
+    return send_request(ROOT_URL + "{0}/latest".format(name), parse_function=parse_function)
 
 
-@app.route("/<username>/posts", methods=["GET"])
-def get_user_posts(username):
+@app.route("/<name>/posts", methods=["GET"])
+def get_user_posts(name):
     count = request.args.get("n", COUNT)
-    return process_post_request(ROOT_URL + "{0}/latest?limit={count}".format(username, count=count))
+    return process_post_request(ROOT_URL + "{0}/latest?limit={count}".format(name, count=count))
 
 
 @app.route("/top")

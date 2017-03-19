@@ -38,28 +38,8 @@ def parse_user(payload):
     if publication_ids is not None and len(publication_ids.keys()) > 0:
         publication_list = []
         for pub_id in publication_ids.keys():
-            publication_dict = ref_dict["Collection"][pub_id]
-            publication = Publication(pub_id)
-            publication.display_name = publication_dict["name"]
-            publication.description = publication_dict["description"]
-            publication.creator_user_id = publication_dict["creatorId"]
-            image_dict = publication_dict["image"]
-            image = parse_images(image_dict)
-            if image is not None:
-                publication.image = image
-            logo_dict = publication_dict["logo"]
-            logo = parse_images(logo_dict)
-            if logo is not None:
-                publication.logo = logo
-            publication.follower_count = publication_dict["metadata"]["followerCount"]
-            publication.post_count = publication_dict["metadata"]["postCount"]
-
-            if "domain" in publication_dict:
-                publication.url = "http://" + publication_dict["domain"]
-            else:
-                publication.url = ROOT_URL + publication_dict["slug"]
-            publication.name = publication_dict["slug"]
-            publication_list.append(to_dict(publication))
+            publication = parse_publication(payload, pub_id)
+            publication_list.append(publication)
         if len(publication_list) > 0:
             user.publications = publication_list
 
@@ -80,8 +60,31 @@ def parse_user(payload):
     return to_dict(user)
 
 
-def parse_publication(payload):
-    pass
+def parse_publication(payload, pub_id=None):
+    if pub_id is None:
+        pub_id = payload["payload"]["collection"]["id"]
+    publication_dict = payload["payload"]["references"]["Collection"][pub_id]
+    publication = Publication(pub_id)
+    publication.display_name = publication_dict["name"]
+    publication.description = publication_dict["description"]
+    publication.creator_user_id = publication_dict["creatorId"]
+    image_dict = publication_dict["image"]
+    image = parse_images(image_dict)
+    if image is not None:
+        publication.image = image
+    logo_dict = publication_dict["logo"]
+    logo = parse_images(logo_dict)
+    if logo is not None:
+        publication.logo = logo
+    publication.follower_count = publication_dict["metadata"]["followerCount"]
+    publication.post_count = publication_dict["metadata"]["postCount"]
+
+    if "domain" in publication_dict:
+        publication.url = "http://" + publication_dict["domain"]
+    else:
+        publication.url = ROOT_URL + publication_dict["slug"]
+    publication.name = publication_dict["slug"]
+    return to_dict(publication)
 
 
 def parse_post(payload):
