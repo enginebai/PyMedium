@@ -208,8 +208,16 @@ class Publication:
         return self._name
 
     @name.setter
-    def name(self, slug):
-        self._name = slug
+    def name(self, name):
+        self._name = name
+
+    @property
+    def url(self):
+        return self._url
+
+    @url.setter
+    def url(self, url):
+        self._url = url
 
     @property
     def creator_user_id(self):
@@ -250,6 +258,14 @@ class Publication:
     @follower_count.setter
     def follower_count(self, count):
         self._follower_count = count
+
+    @property
+    def post_count(self):
+        return self._post_count
+
+    @post_count.setter
+    def post_count(self, count):
+        self._post_count = count
 
 
 class Tag:

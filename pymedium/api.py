@@ -5,7 +5,7 @@ import json
 import requests
 from flask import Flask, jsonify, Response, request
 from selenium import webdriver
-from pymedium.parser import parse_user, parse_post, parse_post_detail
+from pymedium.parser import parse_user, parse_publication, parse_post, parse_post_detail
 from pymedium.model import OutputFormat
 
 ROOT_URL = "https://medium.com/"
@@ -19,13 +19,17 @@ driver = webdriver.Chrome("driver/chromedriver")
 
 @app.route("/<username>", methods=["GET"])
 def get_user_profile(username):
-    return send_request(ROOT_URL + "@{0}/latest".format(username), parse_function=parse_user)
+    if username.startswith("@"):
+        parse_function = parse_user
+    else:
+        parse_function = parse_publication
+    return send_request(ROOT_URL + "{0}/latest".format(username), parse_function=parse_function)
 
 
 @app.route("/<username>/posts", methods=["GET"])
 def get_user_posts(username):
     count = request.args.get("n", COUNT)
-    return process_post_request(ROOT_URL + "@{0}/latest?limit={count}".format(username, count=count))
+    return process_post_request(ROOT_URL + "{0}/latest?limit={count}".format(username, count=count))
 
 
 @app.route("/top")
