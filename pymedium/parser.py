@@ -88,17 +88,17 @@ def parse_publication(payload, pub_id=None):
 
 
 def parse_post(payload):
-    return parse_post_information(payload, ("payload", "references", "Post"))
-
-
-def parse_post_information(payload, post_detail_keys):
-    if post_detail_keys is None:
+    # get the different parsing keys
+    post_detail_parsing_keys = ("payload", "references", "Post")
+    if post_detail_parsing_keys is None:
         return
     post_list_payload = payload
-    for key in post_detail_keys:
+    for key in post_detail_parsing_keys:
         post_list_payload = post_list_payload.get(key)
 
-    def parse_post_dict(post_dict):
+    def parse_post_dict(post_dict, post_id=None):
+        if post_id is None:
+            post_id = post_dict["id"]
         post = Post(post_id)
         unique_slug = post_dict["uniqueSlug"]
         title = post_dict["title"]
@@ -153,11 +153,12 @@ def parse_post_information(payload, post_detail_keys):
         return to_dict(post)
 
     post_list = []
+    # print(post_list_payload)
     # payload -> references -> Post
     if type(post_list_payload) is dict:
         for post_id in post_list_payload.keys():
             post_dict = post_list_payload.get(post_id)
-            post_list.append(parse_post_dict(post_dict))
+            post_list.append(parse_post_dict(post_dict, post_id))
     # payload -> value
     elif type(post_list_payload) is list:
         for post_dict in post_list_payload:

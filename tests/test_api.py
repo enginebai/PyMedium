@@ -30,6 +30,8 @@ class ApiTestCase(unittest.TestCase):
         self.publication_req = requests.get(ROOT + "dualcores-studio")
         print("Request publication profile with custom URL...")
         self.publication_req_custom_url = requests.get(ROOT + "ux-planet")
+        print("Request publication posts with custom URL...")
+        self.publication_post_req_custom_url = requests.get(ROOT + "ux-planet/posts")
 
     def test_apis_ok(self):
         self.assertEqual(self.top_req.status_code, 200)
@@ -41,6 +43,7 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(self.post_detail_req.status_code, 200)
         self.assertEqual(self.publication_req.status_code, 200)
         self.assertEqual(self.publication_req_custom_url.status_code, 200)
+        self.assertEqual(self.publication_post_req_custom_url.status_code, 200)
 
 
 class ApiResponseCase(unittest.TestCase):

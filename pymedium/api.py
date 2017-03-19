@@ -27,9 +27,12 @@ def get_user_or_publication_profile(name):
 
 
 @app.route("/<name>/posts", methods=["GET"])
-def get_user_posts(name):
-    count = request.args.get("n", COUNT)
-    return process_post_request(ROOT_URL + "{0}/latest?limit={count}".format(name, count=count))
+def get_user_or_publication_posts(name):
+    if name.startswith("@"):
+        count = request.args.get("n", COUNT)
+        return process_post_request(ROOT_URL + "{0}/latest?limit={count}".format(name, count=count))
+    else:
+        return process_post_request(ROOT_URL + name)
 
 
 @app.route("/top")
@@ -51,6 +54,7 @@ def get_latest_posts_by_tag(tag_name):
 
 
 def send_request(url, headers=ACCEPT_HEADER, param=None, parse_function=None):
+    print(url)
     req = requests.get(url, headers=headers, params=param)
     req.encoding = "utf8"
     if req.status_code == requests.codes.ok:
