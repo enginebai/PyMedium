@@ -1,10 +1,11 @@
 # PyMedium - Unofficial Medium API
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PyPI](https://badge.fury.io/py/PyMedium.svg)](https://badge.fury.io/py/PyMedium)
 
 ![PyMedium](https://raw.githubusercontent.com/enginebai/PyMedium/master/art/graphic.png)
 
-*PyMedium* is an unofficial Medium API. It provides developers to access to user, post list and detail information from [Medium](
+*PyMedium* is an unofficial Medium API written in python flask. It provides developers to access to user, post list and detail information from [Medium](
 https://medium.com/) website. This is a read-only API to Medium, you can customize this API to fit your requirements and deploy on your own server.
 
 ## Installation
@@ -37,7 +38,7 @@ $ flask run
 ## Documentation
 
 ### Users
-`GET /{username}`
+* `GET /{username}` - Get user profile
 
 #### Response
 ```json
@@ -75,10 +76,10 @@ $ flask run
 ```
 
 ### Post
-* `GET /{username}/posts`
-* `GET /top`
-* `GET /tag/{tag}`
-* `GET /tag/{tag}/latest`
+* `GET /{username}/posts` - Get user latest posts
+* `GET /top` - Get most popular today posts
+* `GET /tag/{tag}` - Get tagged in popular posts
+* `GET /tag/{tag}/latest` - Get tagged in latest posts
 
 #### Parameters
 |Name   |Type   |Description   |
@@ -109,8 +110,7 @@ $ flask run
 ```
 
 ### Post detail
-
-`GET /post`
+* `GET /post` - Get the post content
 
 #### Parameters
 |Name   |Type   |Description   |
