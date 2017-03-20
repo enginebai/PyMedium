@@ -18,7 +18,7 @@ class RegressionTest(unittest.TestCase):
     def test_user_api(self):
         for user in self.users:
             print("1. Requesting", user)
-            url = "{}{}".format(ROOT, user)
+            url = "{}@{}".format(ROOT, user)
             req = requests.get(url)
             self.assertEqual(req.status_code, 200)
 
@@ -34,7 +34,7 @@ class RegressionTest(unittest.TestCase):
             self.assertEqual(r.status_code, 200)
 
         for user in self.users:
-            url = "{}{}/posts".format(ROOT, user)
+            url = "{}@{}/posts".format(ROOT, user)
             print("2-1. Requesting", url)
             user_req = requests.get(url)
             self.assertEqual(user_req.status_code, 200)
@@ -46,8 +46,8 @@ class RegressionTest(unittest.TestCase):
 
     def test_post_detail(self):
         for user in self.users:
-            print("3. Requesting ", user)
-            req = requests.get("{}{}/posts".format(ROOT, user))
+            print("3. Requesting", user)
+            req = requests.get("{}@{}/posts".format(ROOT, user))
             self.assertEqual(req.status_code, 200)
             post_list = json.loads(req.text)
             for post in post_list:
@@ -56,11 +56,26 @@ class RegressionTest(unittest.TestCase):
                 r = requests.get(url)
                 self.assertEqual(r.status_code, 200)
 
+    def test_publication_api(self):
+        for user in self.users:
+            print("4. Requesting", user)
+            url = "{}@{}".format(ROOT, user)
+            user_req = requests.get(url)
+            self.assertEqual(user_req.status_code, 200)
+            user_dict = json.loads(user_req.text)
+            if "publications" in user_dict:
+                publication_list = user_dict["publications"]
+                for pub in publication_list:
+                    self.assertIn("url", pub)
+                    print("4-1. Requesting", pub["url"])
+                    pub_req = requests.get(pub["url"])
+                    self.assertEqual(pub_req.status_code, 200)
+
 
 def test_post_api(username=None):
     url = ROOT + "top"
     if username is not None and username:
-        url = ROOT + "{username}/posts".format(username=username)
+        url = ROOT + "@{username}/posts".format(username=username)
     req = requests.get(url)
     ok = 0
     fail = 0
@@ -80,7 +95,7 @@ def test_post_api(username=None):
 
 
 def test_posts_from_user_interest_tags(username):
-    req = requests.get("{}{}".format(ROOT, username))
+    req = requests.get("{}@{}".format(ROOT, username))
     ok = 0
     fail = 0
     if req.status_code == requests.codes.ok:
@@ -111,7 +126,7 @@ def test_posts_from_user_interest_tags(username):
 
 
 def test_post_detail_api(username):
-    url = ROOT + "{username}/posts".format(username=username)
+    url = ROOT + "@{username}/posts".format(username=username)
     print("Test post detail API from " + url)
     req = requests.get(url)
     if req.status_code == requests.codes.ok:

@@ -17,7 +17,7 @@ $ cd PyMedium
 $ pip install -r requirements.txt
 ```
 
-Then download web driver to `driver` folder from [Selenium](http://selenium-python.readthedocs.io/) or via the command-line with `curl` (update `{VERSION}` with the latest version code and `{OS` with your server operating system.
+Then download web driver to `driver` folder from [Selenium](http://selenium-python.readthedocs.io/) or via the command-line with `curl` (update `{VERSION}` with the latest version code and `{OS}` with your server operating system.
 
 ```shell
 $ mkdir driver | cd driver

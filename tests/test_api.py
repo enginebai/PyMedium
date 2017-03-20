@@ -49,13 +49,19 @@ class ApiTestCase(unittest.TestCase):
 class ApiResponseCase(unittest.TestCase):
 
     def setUp(self):
-        print("Request user profile...")
+        print("Request user profile and publication...")
         self.user_req = requests.get(ROOT + "@enginebai")
+        self.pub_req = requests.get(ROOT + "dualcores-studio")
 
     def test_user_api(self):
         user_dict = json.loads(self.user_req.text)
         self.assertIn("username", user_dict.keys())
         self.assertEqual(user_dict["username"], "enginebai")
+
+    def test_publication_api(self):
+        publication_dict = json.loads(self.pub_req.text)
+        self.assertIn("url", publication_dict)
+        self.assertEqual(publication_dict["url"], "https://medium.com/dualcores-studio")
 
 
 if __name__ == "__main__":
