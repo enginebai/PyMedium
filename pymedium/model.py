@@ -346,6 +346,11 @@ class OutputFormat(Enum):
     MARKDOWN = "md"
 
 
+class Sort(Enum):
+    TOP = "top"
+    LATEST = "latest"
+
+
 def to_dict(model):
     return dict((get_key(key), value)
                 for key, value in model.__dict__.items()
