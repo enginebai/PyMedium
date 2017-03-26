@@ -5,14 +5,11 @@ from urllib.parse import unquote
 
 import requests
 from bs4 import BeautifulSoup
-from selenium import webdriver
 
-from .model import User, Post, Publication, Tag, Image, OutputFormat, to_dict
+from pymedium.model import User, Post, Publication, Tag, Image, OutputFormat, to_dict
+from pymedium.constant import ROOT_URL, HTML_PARSER
 
 __author__ = 'enginebai'
-
-ROOT_URL = "https://medium.com/"
-HTML_PARSER = "html.parser"
 
 
 def parse_user(payload):
