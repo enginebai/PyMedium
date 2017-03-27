@@ -5,8 +5,8 @@ import json
 import requests
 from flask import Flask, jsonify, Response, request
 from selenium import webdriver
-from pymedium.parser import parse_user, parse_publication, parse_post, parse_post_detail
-from pymedium.model import OutputFormat
+from .parser import parse_user, parse_publication, parse_post, parse_post_detail
+from .model import OutputFormat
 import pymedium.constant as const
 
 app = Flask(__name__)
@@ -55,7 +55,7 @@ def send_request(url, headers=const.ACCEPT_HEADER, param=None, parse_function=No
     if req.status_code == requests.codes.ok:
         if parse_function is None:
             parse_function = parse_post
-        model_dict = parse_function(json.loads(req.text.replace(const.ESCAPE_CHARACTERS, "").strip()))
+        model_dict = parse_function(json.loads(req.text.replace(const.ESCAPE_CHARACTERS, "").strip()), return_dict=True)
         return jsonify(model_dict)
     else:
         return Response(status=req.status_code)

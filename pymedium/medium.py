@@ -3,9 +3,9 @@
 import json
 
 import requests
-from pymedium.parser import parse_user, parse_publication, parse_post, parse_post_detail
-from pymedium.constant import ROOT_URL, HTML_PARSER, ACCEPT_HEADER, ESCAPE_CHARACTERS, COUNT
-from pymedium.model import Sort
+from .parser import parse_user, parse_publication, parse_post, parse_post_detail
+from .constant import ROOT_URL, ACCEPT_HEADER, ESCAPE_CHARACTERS, COUNT
+from .model import Sort
 
 
 class Medium(object):

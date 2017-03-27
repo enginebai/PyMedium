@@ -97,6 +97,12 @@ class User:
     def author_tags(self, tags):
         self._author_tags = tags
 
+    def __str__(self, *args, **kwargs):
+        return str(to_dict(self))
+
+    def __repr__(self, *args, **kwargs):
+        return str(to_dict(self))
+
 
 class Post:
     def __init__(self, post_id):
@@ -190,6 +196,12 @@ class Post:
     def post_tags(self, tags):
         self._post_tags = tags
 
+    def __str__(self, *args, **kwargs):
+        return str(to_dict(self))
+
+    def __repr__(self, *args, **kwargs):
+        return str(to_dict(self))
+
 
 class Publication:
     def __init__(self, publication_id):
@@ -267,6 +279,12 @@ class Publication:
     def post_count(self, count):
         self._post_count = count
 
+    def __str__(self, *args, **kwargs):
+        return str(to_dict(self))
+
+    def __repr__(self, *args, **kwargs):
+        return str(to_dict(self))
+
 
 class Tag:
     @property
@@ -309,6 +327,12 @@ class Tag:
     def image(self, image):
         self._image = image
 
+    def __str__(self, *args, **kwargs):
+        return str(to_dict(self))
+
+    def __repr__(self, *args, **kwargs):
+        return str(to_dict(self))
+
 
 class Image:
     def __init__(self, image_id):
@@ -338,6 +362,12 @@ class Image:
     # def url(self, url):
     #     self._url = url
 
+    def __str__(self, *args, **kwargs):
+        return str(to_dict(self))
+
+    def __repr__(self, *args, **kwargs):
+        return str(to_dict(self))
+
 
 class OutputFormat(Enum):
     PLAIN_TEXT = "text"
@@ -355,6 +385,7 @@ def to_dict(model):
     return dict((get_key(key), value)
                 for key, value in model.__dict__.items()
                 if not callable(value) and not key.startswith("__"))
+
 
 def get_key(key):
     return key.replace("_", "", 1) if key.startswith("_") else key
