@@ -108,8 +108,8 @@ $ flask run
 * `GET /@{username}/posts` - Get user latest posts
 * `GET /{publication_name}/posts` - Get publication latest posts
 * `GET /top` - Get most popular today posts
-* `GET /tag/{tag}` - Get tagged in popular posts
-* `GET /tag/{tag}/latest` - Get tagged in latest posts
+* `GET /tags/{tag}` - Get tagged in popular posts
+* `GET /tags/{tag}/latest` - Get tagged in latest posts
 
 #### Parameters
 |Name   |Type   |Description   |
