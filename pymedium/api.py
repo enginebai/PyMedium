@@ -5,8 +5,8 @@ import json
 import requests
 from flask import Flask, jsonify, Response, request
 from selenium import webdriver
-from .parser import parse_user, parse_publication, parse_post, parse_post_detail
-from .model import OutputFormat
+from pymedium.parser import parse_user, parse_publication, parse_post, parse_post_detail
+from pymedium.model import OutputFormat
 import pymedium.constant as const
 
 app = Flask(__name__)

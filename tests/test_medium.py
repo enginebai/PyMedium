@@ -9,6 +9,7 @@ from pymedium.model import Sort
 
 __author__ = "Engine Bai"
 
+
 class TestMedium(unittest.TestCase):
     def setUp(self):
         self.medium = Medium()

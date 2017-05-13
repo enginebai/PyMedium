@@ -6,8 +6,8 @@ from urllib.parse import unquote
 import requests
 from bs4 import BeautifulSoup
 
-from .model import User, Post, Publication, Tag, Image, OutputFormat, to_dict
-from .constant import ROOT_URL, HTML_PARSER
+from pymedium.model import User, Post, Publication, Tag, Image, OutputFormat, to_dict
+from pymedium.constant import ROOT_URL, HTML_PARSER
 
 __author__ = 'enginebai'
 
@@ -77,7 +77,8 @@ def parse_publication(payload, pub_id=None, return_dict=False):
     if logo is not None:
         publication.logo = logo
     publication.follower_count = publication_dict["metadata"]["followerCount"]
-    publication.post_count = publication_dict["metadata"]["postCount"]
+    if "postCount" in publication_dict["metadata"]:
+        publication.post_count = publication_dict["metadata"]["postCount"]
 
     if "domain" in publication_dict:
         publication.url = "http://" + publication_dict["domain"]
