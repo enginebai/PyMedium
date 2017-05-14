@@ -4,13 +4,11 @@ import json
 
 import requests
 from flask import Flask, jsonify, Response, request
-from selenium import webdriver
 from pymedium.parser import parse_user, parse_publication, parse_post, parse_post_detail
 from pymedium.model import OutputFormat
 import pymedium.constant as const
 
 app = Flask(__name__)
-driver = webdriver.Chrome("driver/chromedriver")
 
 
 @app.route("/<name>", methods=["GET"])
@@ -55,7 +53,7 @@ def send_request(url, headers=const.ACCEPT_HEADER, param=None, parse_function=No
     if req.status_code == requests.codes.ok:
         if parse_function is None:
             parse_function = parse_post
-        model_dict = parse_function(json.loads(req.text.replace(const.ESCAPE_CHARACTERS, "").strip()))
+        model_dict = parse_function(json.loads(req.text.replace(const.ESCAPE_CHARACTERS, "").strip()), return_dict=True)
         return jsonify(model_dict)
     else:
         return Response(status=req.status_code)
@@ -77,7 +75,7 @@ def get_post():
     if not output_format:
         output_format = OutputFormat.PLAIN_TEXT.value
     if url:
-        detail_str = parse_post_detail(url, output_format, driver)
+        detail_str = parse_post_detail(url, output_format)
         status_code = 200
         mime_type = "text/html"
         if output_format == OutputFormat.JSON.value:

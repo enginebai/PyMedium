@@ -12,7 +12,7 @@ from pymedium.constant import ROOT_URL, HTML_PARSER
 __author__ = 'enginebai'
 
 
-def parse_user(payload):
+def parse_user(payload, return_dict=False):
     user_dict = payload["payload"]["user"]
     user_id = user_dict["userId"]
     user = User(user_id)
@@ -27,15 +27,15 @@ def parse_user(payload):
     ref_dict = payload["payload"]["references"]
 
     # interest_tags = user_meta_dict["interestTags"]
-    # user.interest_tags = parse_tags(interest_tags)
+    # user.interest_tags = parse_tags(interest_tags, return_dict)
     # author_tags = user_meta_dict["authorTags"]
-    # user.author_tags = parse_tags(author_tags)
+    # user.author_tags = parse_tags(author_tags, return_dict)
 
     publication_ids = ref_dict["Collection"]
     if publication_ids is not None and len(publication_ids.keys()) > 0:
         publication_list = []
         for pub_id in publication_ids.keys():
-            publication = parse_publication(payload, pub_id)
+            publication = parse_publication(payload, pub_id, return_dict)
             publication_list.append(publication)
         if len(publication_list) > 0:
             user.publications = publication_list
@@ -54,10 +54,13 @@ def parse_user(payload):
     user.following_count = following_count
     user.followedby_count = followby_count
 
-    return to_dict(user)
+    if return_dict:
+        return to_dict(user)
+    else:
+        return user
 
 
-def parse_publication(payload, pub_id=None):
+def parse_publication(payload, pub_id=None, return_dict=False):
     if pub_id is None:
         pub_id = payload["payload"]["collection"]["id"]
     publication_dict = payload["payload"]["references"]["Collection"][pub_id]
@@ -66,25 +69,29 @@ def parse_publication(payload, pub_id=None):
     publication.description = publication_dict["description"]
     publication.creator_user_id = publication_dict["creatorId"]
     image_dict = publication_dict["image"]
-    image = parse_images(image_dict)
+    image = parse_images(image_dict, return_dict)
     if image is not None:
         publication.image = image
     logo_dict = publication_dict["logo"]
-    logo = parse_images(logo_dict)
+    logo = parse_images(logo_dict, return_dict)
     if logo is not None:
         publication.logo = logo
     publication.follower_count = publication_dict["metadata"]["followerCount"]
-    publication.post_count = publication_dict["metadata"]["postCount"]
+    if "postCount" in publication_dict["metadata"]:
+        publication.post_count = publication_dict["metadata"]["postCount"]
 
     if "domain" in publication_dict:
         publication.url = "http://" + publication_dict["domain"]
     else:
         publication.url = ROOT_URL + publication_dict["slug"]
     publication.name = publication_dict["slug"]
-    return to_dict(publication)
+    if return_dict:
+        return to_dict(publication)
+    else:
+        return publication
 
 
-def parse_post(payload):
+def parse_post(payload, return_dict=False):
     # get the different parsing keys
     post_detail_parsing_keys = ("payload", "references", "Post")
     if post_detail_parsing_keys is None:
@@ -92,6 +99,12 @@ def parse_post(payload):
     post_list_payload = payload
     for key in post_detail_parsing_keys:
         post_list_payload = post_list_payload.get(key)
+
+    if post_list_payload is None:
+        post_detail_parsing_keys = ("payload", "posts")
+        post_list_payload = payload
+        for key in post_detail_parsing_keys:
+            post_list_payload = post_list_payload.get(key)
 
     def parse_post_dict(post_dict, post_id=None):
         if post_id is None:
@@ -129,7 +142,7 @@ def parse_post(payload):
         image_count = virtual_dict["imageCount"]
         preview_image = virtual_dict["previewImage"]
         # post_tags = virtual_dict["tags"]
-        # post.post_tags = parse_tags(post_tags)
+        # post.post_tags = parse_tags(post_tags, return_dict)
 
         # post.unique_slug = unique_slug
         post.title = title
@@ -140,17 +153,20 @@ def parse_post(payload):
         post.read_time = read_time
         post.word_count = word_count
         post.image_count = image_count
-        image = parse_images(preview_image)
+        image = parse_images(preview_image, return_dict)
         if image is not None:
             post.preview_image = image
 
         # print("{id}, {title}".format(id=post_id, title=title))
         # print("{recommend}, {response}, {read}".format(
         # recommend=recommend_count, response=response_count, read=read_time))
-        return to_dict(post)
+        if return_dict:
+            return to_dict(post)
+        else:
+            return post
 
     post_list = []
-    # print(post_list_payload)
+    print(post_list_payload)
     # payload -> references -> Post
     if type(post_list_payload) is dict:
         for post_id in post_list_payload.keys():
@@ -164,7 +180,7 @@ def parse_post(payload):
     return post_list
 
 
-def parse_tags(tags_list_dict):
+def parse_tags(tags_list_dict, return_dict=False):
     if tags_list_dict is not None and len(tags_list_dict) > 0:
         tags_list = []
         for tag_dict in tags_list_dict:
@@ -175,11 +191,14 @@ def parse_tags(tags_list_dict):
             metadata_dict = tag_dict["metadata"]
             if metadata_dict is not None:
                 tag.follower_count = metadata_dict["followerCount"]
-            tags_list.append(to_dict(tag))
+            if return_dict:
+                tags_list.append(to_dict(tag))
+            else:
+                tags_list.append(tag)
         return tags_list
 
 
-def parse_images(image_dict):
+def parse_images(image_dict, return_dict=False):
     if image_dict is not None:
         image_id = image_dict["imageId"] if "imageId" in image_dict else image_dict["id"]
         if image_id:
@@ -191,12 +210,15 @@ def parse_images(image_dict):
             #     .format(width=image.original_width,
             #             height=image.original_height,
             #             id=image.image_id)
-            return to_dict(image)
+            if return_dict:
+                return to_dict(image)
+            else:
+                return image
         else:
             return None
 
 
-def parse_post_detail(post_url, output_format, driver):
+def parse_post_detail(post_url, output_format):
     # driver = webdriver.Remote(desired_capabilities=DesiredCapabilities.CHROME)
     # for json format, just return medium json response
     if output_format == OutputFormat.JSON.value:
@@ -206,17 +228,14 @@ def parse_post_detail(post_url, output_format, driver):
         else:
             return None
     else:
-        # for else formats, use Selenium to render page to get actual content and parse it
-        driver.get(post_url)
-        content_elements = driver.find_element_by_class_name("postArticle-content")
-        inner_html = BeautifulSoup(content_elements.get_attribute("innerHTML"), HTML_PARSER)
+        inner_html = BeautifulSoup(requests.get(post_url).text, HTML_PARSER)
         content_tags = inner_html.find_all()
 
         response = ""
         if output_format == OutputFormat.MARKDOWN.value:
             for i in range(0, len(content_tags)):
                 tag = content_tags[i]
-                md = to_markdown(tag, driver)
+                md = to_markdown(tag)
                 if md is not None and md:
                     response += md + "\n"
         elif output_format == OutputFormat.HTML.value:
@@ -234,7 +253,7 @@ def strip_space(text, trim_space=True):
         return text
 
 
-def to_markdown(medium_tag, driver):
+def to_markdown(medium_tag):
     text = strip_space(medium_tag.text)
     if medium_tag.name == 'h3':
         return '\n## {}'.format(text)

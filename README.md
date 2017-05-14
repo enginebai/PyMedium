@@ -8,6 +8,8 @@
 *PyMedium* is an unofficial Medium API written in python flask. It provides developers to access to user, post list and detail information from [Medium](
 https://medium.com/) website. This is a read-only API to access public information from Medium, you can customize this API to fit your requirements and deploy on your own server.
 
+Now we provide another way: python client SDK to let you integrate into your application. More detail go to [wiki page](https://github.com/enginebai/PyMedium/wiki/Python-SDK).
+
 ## Installation
 Before running PyMedium API, you have to clone the code from this repository, install requirements at first.
 
