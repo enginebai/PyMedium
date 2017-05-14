@@ -16,7 +16,6 @@ setup(
     install_requires=[
         'flask',
         'bs4',
-        'requests',
-        'selenium'
+        'requests'
       ],
 )

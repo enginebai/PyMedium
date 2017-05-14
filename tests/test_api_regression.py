@@ -12,8 +12,8 @@ ROOT = "http://localhost:5000/"
 class RegressionTest(unittest.TestCase):
     def setUp(self):
         self.users = (
-        "sitapati", "enginebai", "101", "mobiscroll", "richard.yang.uw", "tzhongg", "jon.moore", "JonDeng",
-        "waymo", "quincylarson", "benjaminhardy", "jsaito", "lindacaroll", "jasonfried")
+            "sitapati", "enginebai", "101", "mobiscroll", "richard.yang.uw", "tzhongg", "jon.moore", "JonDeng",
+            "waymo", "quincylarson", "benjaminhardy", "jsaito", "lindacaroll", "jasonfried")
 
     def test_user_api(self):
         for user in self.users:

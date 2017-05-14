@@ -218,7 +218,7 @@ def parse_images(image_dict, return_dict=False):
             return None
 
 
-def parse_post_detail(post_url, output_format, driver):
+def parse_post_detail(post_url, output_format):
     # driver = webdriver.Remote(desired_capabilities=DesiredCapabilities.CHROME)
     # for json format, just return medium json response
     if output_format == OutputFormat.JSON.value:
@@ -228,17 +228,14 @@ def parse_post_detail(post_url, output_format, driver):
         else:
             return None
     else:
-        # for else formats, use Selenium to render page to get actual content and parse it
-        driver.get(post_url)
-        content_elements = driver.find_element_by_class_name("postArticle-content")
-        inner_html = BeautifulSoup(content_elements.get_attribute("innerHTML"), HTML_PARSER)
+        inner_html = BeautifulSoup(requests.get(post_url).text, HTML_PARSER)
         content_tags = inner_html.find_all()
 
         response = ""
         if output_format == OutputFormat.MARKDOWN.value:
             for i in range(0, len(content_tags)):
                 tag = content_tags[i]
-                md = to_markdown(tag, driver)
+                md = to_markdown(tag)
                 if md is not None and md:
                     response += md + "\n"
         elif output_format == OutputFormat.HTML.value:
@@ -256,7 +253,7 @@ def strip_space(text, trim_space=True):
         return text
 
 
-def to_markdown(medium_tag, driver):
+def to_markdown(medium_tag):
     text = strip_space(medium_tag.text)
     if medium_tag.name == 'h3':
         return '\n## {}'.format(text)
